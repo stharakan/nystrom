@@ -24,8 +24,10 @@ p=m;
 %random choice
 if strcmp(pick,'random')
     idx_m = randpick(m,n);
+elseif n==m
+  idx_m = [1:n]';
 %kmeans
-elseif strcmp(pick,'kmeans')
+else strcmp(pick,'kmeans')
     idx_m = kmeanspick(X,m,ll);
 end
 
