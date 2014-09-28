@@ -20,12 +20,7 @@ function [output] = testdata(alpha,sigma,Xtrain,Xtest)
 [n,~] = size(Xtrain);
 [m,~] = size(Xtest);
 
-trnorms = sum(Xtrain.*Xtrain,2);
-tenorms = sum(Xtest.*Xtest,2);
-K = exp(-(repmat(tenorms,1,n) + repmat(trnorms',m,1) ...
-    - 2*Xtest*Xtrain')/(2*sigma^2));
-
-
+K = kernel(Xtest, Xtrain, sigma);
 output = K*alpha;
 end
 

@@ -10,13 +10,15 @@ close all
 filename = 'spiral_cs8000_n05';
 k = 6; % # of nearest neighbors
 labeled = 4000; % # of labeled points in each class 
-m = 1024; % size of smaller system to solve
+m = 256; % size of smaller system to solve
 cv_folds = 5; % # of cross-val folds
 
 disp('Loading training data ... ')
 load(['train',filename]);
 [n,~] = size(X); n = n/2;
 idx = [1:labeled n+1:n+labeled labeled+1:n n+labeled+1:2*n];
+
+%%
 Xtrain = X(idx,:);
 Ytrain = zeros(size(Y));
 Ytrain(1:2*labeled) = Y(idx(1:2*labeled));
@@ -35,30 +37,77 @@ disp('NNs calculated. Finding sigma ... ')
 warning('off','all');
 warning
 
+%%
+%sigmas=sigmas(1:2);
 disp('Generating L curve data ...');
-[alpha_norms, res_norms] = makeLcurve(Xtrain, Ytrain, m, sigmas);
-alpha_norms = log(alpha_norms);
-res_norms = log(res_norms);
+sample = createsample(Xtrain,m,Ytrain,'kmeans with classes');
+[alpha_norms, res_norms, spectra] = makeLcurve(Xtrain, Ytrain, m, sigmas,sample);
 
 %%
-%corners = zeros(size(sigmas));
-%for i= 1:length(sigmas)
-%	[k,info] = corner(res_norms(:,i),alpha_norms(:,i));
-%	corners(i) = k;
-%end
+corners = zeros(size(sigmas));  % L-curve analysis
+gcv     = zeros(size(sigmas));       % generalized cross validation
+mpr   = zeros(size(sigmas));
 
-disp('Saving L curve data ... ');
-save([filename,'_Lcurves'], 'alpha_norms','res_norms','sigmas');
+gcv_d=[1:m]'; gcv_d=m-gcv_d;
+fprintf('        kc   rc \t ac\t  | kg   rg\t  ag \t   |km \t   rm\t\t am\t | rmin \n');
+fprintf('----------------------------------------------------------------------------\n');
+for i= 1:length(sigmas)
+  % Lcurve analysis
+	[k,info] = corner(res_norms(:,i),alpha_norms(:,i));
+	corners(i) = k;
+  corner_best(i) = res_norms(k,i);
+  corner_k(i) = k;
+  
+  % generalized cross-validation with truncated SVD
+  [~,kg] = min(res_norms(:,i)./gcv_d);
+  gcv(i)=res_norms(kg,i);
+  gcv_best(i) = res_norms(kg,i);
+  gcv_k(i) = kg;
+  
+  % hack
+  [~,km] = min(res_norms(:,i).*alpha_norms(:,i));
+  mpr(i) = res_norms(km,i);
+  mpr_best(i) = res_norms(km,i);
+  mpr_k(i) = km;
+  
+  
+  fprintf('[i=%2d] %03d %.1e %.1e| %03d %.1e %.1e| %03d %.1e %.1e | %.1e\n',...,
+  i,k, res_norms(k,i), alpha_norms(k,i),...
+    kg,res_norms(kg,i),alpha_norms(kg,i),...
+    km,res_norms(km,i),alpha_norms(km,i),...
+    res_norms(end,i));
+  
+  
+  hold off; 
+  loglog(res_norms(:,i),alpha_norms(:,i));
+  hold on;
+  loglog(res_norms(k,i),alpha_norms(k,i),'.','MarkerSize',10);
+  loglog(res_norms(kg,i),alpha_norms(kg,i),'.r','MarkerSize',10);
+  loglog(res_norms(km,i),alpha_norms(km,i),'.g','MarkerSize',10);
+  hold off;
+  pause;
+end
+[~,imin] = min(corner_best); sigma_c = sigmas(imin); gamma_c= spectra(corner_k(imin),imin);
+[~,imin] = min(gcv_best);    sigma_g = sigmas(imin); gamma_g= spectra(gcv_k(imin),imin);
+[~,imin] = min(mpr_best);    sigma_m = sigmas(imin); gamma_m= spectra(mpr_k(imin),imin);
+
+%%
+%disp('Saving L curve data ... ');
+%save([filename,'_Lcurves'], 'alpha_norms','res_norms','sigmas');
+
 
 %Find optimal sigma from given range
 %[sigma,Us,Ls,alpha] = findsigma(Xtrain,Ytrain,m,sigmas,cv_folds);
 
-%Evaluate error after calculating sigma
-%ystar = testdata(alpha,sigma,Xtrain,Xtest);
-%correctclass = sum(ystar(1:n) > 0) + sum(ystar(n+1:end) < 0);
-%disp(['Correctly classified ', num2str(correctclass), ' out of ', ...
-%    num2str(2*n), ' elements'])
+alpha = nystromsolve(Xtrain,Ytrain,sample,sigma_c, gamma_c);
+sigma = sigma_c;
 
+%Evaluate error after calculating sigma
+ystar = testdata(alpha,sigma,Xtrain,Xtest);
+correctclass = sum(ystar(1:n) > 0) + sum(ystar(n+1:end) < 0);
+disp(['Correctly classified ', num2str(correctclass), ' out of ', ...
+    num2str(2*n), ' elements'])
+%%
 %Find regularizer gamma
 %[gammaA,alpha,knorms,residuals] = findgammaA(Xtrain,Ytrain,sigma,m,cv_folds);
 

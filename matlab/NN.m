@@ -41,7 +41,7 @@ end
 % title('Distances to furthest vs nearest neighbor')
 % legend('Furthest neighbor','Nearest neighbor')
 
-sigma = linspace(max(dist(:,1)), max(dist(:,end)), 10);
+sigma = linspace(max(dist(:,1))/2, 10*max(dist(:,end)), 10);
 sigma = sigma./4;
 
 

@@ -1,4 +1,4 @@
-function [Un, Ln] = nystromeig(X,m,sigma,ll,pick)
+function [Un, Ln] = nystromeig(X,sigma, sample)
 %NYSTROMEIG Computes the nystrom approximation to the kernel gram matrix K.
 %The paper we are following allows a further time speed up by introducing p
 %<= m but for now we assume p = m (so they are interchangeable for now).
@@ -19,27 +19,37 @@ function [Un, Ln] = nystromeig(X,m,sigma,ll,pick)
 %       eigenvectors of Un
 
 [n,d] = size(X);
+m = length(sample);
 p=m;
 
-%random choice
-if strcmp(pick,'random')
-    idx_m = randpick(m,n);
-elseif n==m
-  idx_m = [1:n]';
-%kmeans
-else strcmp(pick,'kmeans')
-    idx_m = kmeanspick(X,m,ll);
-end
+idx_m = sample;
 
-xnorms = sum(X.*X,2); % n x 1 vector of square norms of X
-K_nm = exp(-(repmat(xnorms,1,m) + repmat(xnorms(idx_m)',n,1) ...
-    - 2.*X*X(idx_m,:)')./(2*sigma^2));
+% %random choice
+% if strcmp(pick,'random')
+%     idx_m = randpick(m,n);
+% elseif n==m
+%   idx_m = [1:n]';
+% %kmeans
+% else strcmp(pick,'kmeans')
+%     idx_m = kmeanspick(X,m,ll);
+% end
 
-[Um,Lm] = eig(K_nm(idx_m,:));
+% xnorms = sum(X.*X,2); % n x 1 vector of square norms of X
+% K_nm1 = exp(-(repmat(xnorms,1,m) + repmat(xnorms(idx_m)',n,1) ...
+%     - 2.*X*X(idx_m,:)')./(2*sigma^2));
 
-Ln = (n/m).*diag(Lm);
-Ln = Ln(m:-1:m-p+1);
+K_nm=kernel(X,X(sample,:),sigma);
 
-Un = (sqrt(n/m)).*((K_nm*Um(:,m:-1:m-p+1))*(diag(1./Ln)));
+
+% [Um,Lm] = eig(K_nm(idx_m,:));
+% Ln = (n/m).*diag(Lm);
+% Ln = Ln(m:-1:m-p+1);
+% 
+% Un = (sqrt(n/m)).*((K_nm*Um(:,m:-1:m-p+1))*(diag(1./Ln)));
+
+
+[Um,Lm,~]=svd(K_nm(idx_m,:));
+Ln = n/m*diag(Lm);
+Un=sqrt(n/m)*(K_nm*Um)*diag(1./Ln);
 
 end

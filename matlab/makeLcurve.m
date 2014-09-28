@@ -1,21 +1,22 @@
-function [a_norms, residuals] = makeLcurve(X,Y,m,sigmas)
+function [a_norms, residuals, spectra] = makeLcurve(X,Y,m,sigmas,sample)
 %MAKELCURVE creates an L-curve for each value of sigma, comparing
 %the norm of the residual with the norm of alpha. 
 
 %Initialize
 numsigs = length(sigmas);
 [n,~] = size(X);
-ll = histc(Y,unique(Y));
 a_norms = zeros(m,numsigs);
 residuals = zeros(m,numsigs);
 
+spectra=zeros(m,numsigs);
 %Loop through each sigma
+
 for ii = 1:numsigs
 	disp(['Generating L curve for sigma ', num2str(ii)]);
 	sig = sigmas(ii);
 
 	%Decompose K into K = U L U'
-	[U,L] = nystromeig(X,m,sig,ll,'kmeans');
+	[U,L] = nystromeig(X,sig,sample);
 	
 	%Orthogonalize U = Q R
 	[Q,R] = qr(U,0);
@@ -23,8 +24,10 @@ for ii = 1:numsigs
 	%Eigendecompose inner matrix R L R' = Qs S Qs', diagonalize
 	[Qs,S] = eig(R*diag(L)*R');
 	S = diag(S);
-	disp(['Highest eval of s: ', num2str(S(1))]);
-	disp(['Lowest eval of s : ', num2str(S(end))]);
+  spectra(:,ii) = S;
+  
+% 	disp(['Highest eval of s: ', num2str(S(1))]);
+% 	disp(['Lowest eval of s : ', num2str(S(end))]);
 
 	%Project Y onto subspace spanned by Q * Qs
 	qy = Qs'*(Q'*Y);
