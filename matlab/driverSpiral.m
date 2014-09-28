@@ -10,7 +10,7 @@ close all
 filename = 'spiral_cs8000_n05';
 k = 6; % # of nearest neighbors
 labeled = 4000; % # of labeled points in each class 
-m = 256; % size of smaller system to solve
+m = 1024; % size of smaller system to solve
 cv_folds = 5; % # of cross-val folds
 
 disp('Loading training data ... ')
@@ -49,6 +49,7 @@ gcv     = zeros(size(sigmas));       % generalized cross validation
 mpr   = zeros(size(sigmas));
 
 gcv_d=[1:m]'; gcv_d=m-gcv_d;
+fprintf('----------------------------------------------------------------------------\n');
 fprintf('        kc   rc \t ac\t  | kg   rg\t  ag \t   |km \t   rm\t\t am\t | rmin \n');
 fprintf('----------------------------------------------------------------------------\n');
 for i= 1:length(sigmas)
@@ -85,11 +86,14 @@ for i= 1:length(sigmas)
   loglog(res_norms(kg,i),alpha_norms(kg,i),'.r','MarkerSize',10);
   loglog(res_norms(km,i),alpha_norms(km,i),'.g','MarkerSize',10);
   hold off;
-  pause;
+  pause(1);
 end
 [~,imin] = min(corner_best); sigma_c = sigmas(imin); gamma_c= spectra(corner_k(imin),imin);
 [~,imin] = min(gcv_best);    sigma_g = sigmas(imin); gamma_g= spectra(gcv_k(imin),imin);
 [~,imin] = min(mpr_best);    sigma_m = sigmas(imin); gamma_m= spectra(mpr_k(imin),imin);
+
+sigma_win= [sigma_c,sigma_g,sigma_m];
+gamma_win= [gamma_c, gamma_g, gamma_m]; 
 
 %%
 %disp('Saving L curve data ... ');
@@ -99,14 +103,17 @@ end
 %Find optimal sigma from given range
 %[sigma,Us,Ls,alpha] = findsigma(Xtrain,Ytrain,m,sigmas,cv_folds);
 
-alpha = nystromsolve(Xtrain,Ytrain,sample,sigma_c, gamma_c);
-sigma = sigma_c;
+for win=1:3
+  sigma = sigma_win(win);
+  gamma = gamma_win(win);
+  alpha = nystromsolve(Xtrain,Ytrain,sample,sigma, gamma);
 
-%Evaluate error after calculating sigma
-ystar = testdata(alpha,sigma,Xtrain,Xtest);
-correctclass = sum(ystar(1:n) > 0) + sum(ystar(n+1:end) < 0);
-disp(['Correctly classified ', num2str(correctclass), ' out of ', ...
+  %Evaluate error after calculating sigma
+  ystar = testdata(alpha,sigma,Xtrain,Xtest);
+  correctclass = sum(ystar(1:n) > 0) + sum(ystar(n+1:end) < 0);
+  disp(['Correctly classified ', num2str(correctclass), ' out of ', ...
     num2str(2*n), ' elements'])
+end
 %%
 %Find regularizer gamma
 %[gammaA,alpha,knorms,residuals] = findgammaA(Xtrain,Ytrain,sigma,m,cv_folds);
