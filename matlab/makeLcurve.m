@@ -44,7 +44,7 @@ for ii = 1:numsigs
 		a_norms(jj,ii) = norm(s_qy(1:jj),2);
 		
 		%||K alpha_jj - Y|| = sqrt(base error^2 + in_space error^2) 
-		residuals(jj,ii) = sqrt(base_res + norm(qy(jj+1:end),2)^2);
+		residuals(jj,ii) = sqrt((base_res + norm(qy(jj+1:end),2)^2)/n);
 	end
 end
 disp('All curves made');
