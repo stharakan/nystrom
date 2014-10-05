@@ -39,7 +39,7 @@ try
  end;
  
 catch
-  assert(0);
+  assert(false);
   dist=zeros(N);
   tic;
   fprintf('Not enough Memory\nComputing distance line by line ...\n');
