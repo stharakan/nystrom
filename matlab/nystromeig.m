@@ -1,4 +1,4 @@
-function [Un, Ln] = nystromeig(X,sigma, sample)
+function [Un, Ln] = nystromeig(X,sigma, sample,p)
 %NYSTROMEIG Computes the nystrom approximation to the kernel gram matrix K.
 %The paper we are following allows a further time speed up by introducing p
 %<= m but for now we assume p = m (so they are interchangeable for now).
@@ -20,7 +20,9 @@ function [Un, Ln] = nystromeig(X,sigma, sample)
 
 [n,d] = size(X);
 m = length(sample);
-p=m;
+if ~exist('p')
+				p=m;
+end
 
 idx_m = sample;
 
@@ -51,5 +53,8 @@ K_nm=kernel(X,X(sample,:),sigma);
 [Um,Lm,~]=svd(K_nm(idx_m,:));
 Ln = n/m*diag(Lm);
 Un=sqrt(n/m)*(K_nm*Um)*diag(1./Ln);
+
+Ln = Ln(1:p);
+Un = Un(:,1:p);
 
 end

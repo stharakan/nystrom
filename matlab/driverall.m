@@ -8,16 +8,16 @@ clear all
 close all
 
 file = 'wine'; % choose file
-samples = 'random'; % how to do nystrom sampling
+dir = '/org/groups/padas/lula_data/machine_learning/'; %specify dir
+samples = 'kmeans'; % how to do nystrom sampling
 k = 6; % # of nearest neighbors
 labeled = 4000; % # of labeled points in each class (only needed for spiral)
-m = 1024; % size of smaller system to solve
+m = 128; % size of smaller system to solve
 cv_folds = 5; % # of cross-val folds
 meka_sig = sqrt(2^9);
 meka_gam = 2^(-4); 
 
 %% Load data
-addpath('/scratch/data/machine_learning')
 [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(file, labeled);
 
 %{
@@ -111,26 +111,31 @@ gamma_win= [gamma_c, gamma_g, gamma_m, meka_gam];
 %Find optimal sigma from given range
 %[sigma,Us,Ls,alpha] = findsigma(Xtrain,Ytrain,m,sigmas,cv_folds);
 
-for win=1:3
+
+ystar = zeros(length(Yexact),4);
+
+for win=1:4
   sigma = sigma_win(win);
   gamma = gamma_win(win);
   alpha = nystromsolve(Xtrain,Ytrain,sample,sigma, gamma);
-  ystar = testdata(alpha,sigma,Xtrain,Xtest);
-				
+  ystar(:,win) = testdata(alpha,sigma,Xtrain,Xtest);
+	
+  				
   %Evaluate error after calculating sigma, gamma -- BINARY CLASSIFICATION [-1,1]
   if isequal(file, 'spiral')
-					correctclass = sum(ystar(1:n) > 0) + sum(ystar(n+1:end) < 0);
+					correctclass = sum(ystar(1:n,win) > 0) + sum(ystar(n+1:end,win) < 0);
 					disp(['Correctly classified ', num2str(correctclass), ' out of ', ...
 								num2str(2*n), ' elements']);
 
 	%Evaluate error after calculating sigma, gamma -- Regression or ordered Multiclass (RMSE)
 	else
-					RMSE =  sqrt(sum((ystar - Yexact).^2)/n);
+					RMSE =  sqrt(sum((ystar(:,win) - Yexact).^2)/n);
 					disp(['RMSE is ', num2str(RMSE)]);
-					disp([num2str(max(ystar)), ' ', num2str(min(ystar))]);
+					disp([num2str(max(ystar(:,win))), ' ', num2str(min(ystar(:,win)))]);
 	end
 end
 %%
+save([file,'_yscores'],'sigma_win','gamma_win','ystar');
 %Find regularizer gamma
 %[gammaA,alpha,knorms,residuals] = findgammaA(Xtrain,Ytrain,sigma,m,cv_folds);
 
