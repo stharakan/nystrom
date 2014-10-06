@@ -61,24 +61,6 @@ elseif isequal(dataset,'susy')
 				[n,~] = size(Xtrain);
 				disp('Done loading data! (Test and training are the same)')
 
-elseif isequal(dataset,'cpu')
-
-				disp('Reading in cpusmall data');
-				filename = 'cpusmall';
-				fid = fopen([dir,filename]);
-				x = textscan(fid,'%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f %d:%f');
-				fclose(fid);
-				idx = 1 + 2.*(1:12);
-				
-				Ytrain = x{1}; Yexact = [];
-				Xtrain = zeros(length(x{1}),12);
-				Xtest = [];
-				for i = 1:length(idx)
-								Xtrain(:,i) = x{idx(i)};
-				end
-				n = length(x{1});
-				disp('Done loading data! (Test and training are the same)');
-
 elseif isequal(dataset,'covtype')
 				
 				disp('Reading in covertype data')
@@ -90,6 +72,21 @@ elseif isequal(dataset,'covtype')
 				Yexact = []; Xtest = [];
 				disp('Done loading data! (Test and training are the same)');
 
+elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
+
+				disp(['Reading in ', dataset, ' data'])
+				fid = fopen([dir,dataset]);
+				x = textscan(fid,'','Delimiter',{':',' '});
+				Ytrain = x{1};
+
+				n = length(Ytrain); m = max(x{end-1});
+				Xtrain = zeros(n, m);
+				for i = 1: (length(x)-1)/2
+								Xtrain = Xtrain + sparse(1:n,x{2*i},x{2*i + 1},n,m);
+				end
+				Xtest = []; Yexact = [];
+				fclose(fid);
+				
 else
 				disp('Error: Data not found - type help loaddata for options');
 end

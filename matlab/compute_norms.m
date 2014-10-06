@@ -1,19 +1,20 @@
 % script to estimate the norm of the approximate kernel matrix used by the 
 % Nystrom method -- ready for use on the following files:
 %
-% cpusmall - 'cpu'
+% cpusmall - 'cpusmall' NEEDS TO BE SCALED!!
 % winequality - 'wine'
 % synthetic spiral - 'spiral'
 % SUSY - 'susy' 
 % covertype - 'covtype'
-% 
+% ijcnn1 - 'ijcnn1'
+% mnist8m - 'mnist8m' --> not yet working
 
 % Load data
-file = 'susy';
+file = 'ijcnn1';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
 tic;
-[X,Y,~,~,~] = loaddata(file,dir);
+[X,~,~,~,~] = loaddata(file,dir);
 toc
 
 [N,d] = size(X);
@@ -25,13 +26,13 @@ sigma = sigma_given(file);
 % create function handle
 disp('-----Nystrom decmp-------')
 tic;
-sample = createsample(X,nystrom_m,Y,sample_method);
+sample = createsample(X,nystrom_m,[],sample_method);
 [U, L] = nystromeig(X, sigma, sample,nystrom_rank);
 toc
 matvec = @(rhs) NystromMatVec(U, L, rhs);
 
 % Estimate Norms
-num_norm_samples =10;
+num_norm_samples = 10;
 disp('-----Estimate norm------')
 tic;
 est_norm = Estimate2Norm(matvec, num_norm_samples, N);

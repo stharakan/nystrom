@@ -24,8 +24,9 @@ try
   [D,n] = size(x);
   X2 = sum(X.^2,1);
   x2 = sum(x.^2,1);
-  dotProd = X'*x; 
-  dist = repmat(x2,N,1)+repmat(X2',1,n)-2*dotProd;
+  dist = repmat(x2,N,1);
+	dist = dist + repmat(X2',1,n);
+	dist = dist - 2*X'*x;
  else    
   [D,N] = size(X);
   if(exist('addv') & exist('addh'))

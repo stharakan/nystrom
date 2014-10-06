@@ -5,8 +5,8 @@ function [result] = Estimate2Norm(matvec_handle, num_samples, N)
 % N - size of the matrix
 % matvec_handle -- performs the matrix vector multiply
 
-    u = randn(N,1);
-    u = u / norm(u);
+    u = ones(N,1);
+    u = u./sqrt(N);
    
     for i=1:num_samples
 
