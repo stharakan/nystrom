@@ -3,6 +3,15 @@ function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
 % under the following specifications
 % 'spiral' - test/trainspiral_cs8000_n05
 % 'wine'   - winequality-red/white.csv
+% 'susy' - unscaled susy data
+% 'covtype' - unscaled covtype
+% 'ijcnn1' - unscaled ijcnn1
+% 'cpusmall' - unscaled cpusmall
+%
+%%%%%  ------- %%%%%%%%
+% ANY .askit FILE - GIVE EXACT FILE NAME
+%%%%%  ------- %%%%%%%%
+
 
 
 if ~exist('labeled') %ignored for non-synthetic datasets
@@ -49,6 +58,7 @@ elseif isequal(dataset,'wine')
 				[n, ~] = size(Xtrain);
 				disp('Done loading data! (Test and training are the same)')
 
+
 elseif isequal(dataset,'susy')
 				
 				disp('Reading in SUSY data')
@@ -88,6 +98,14 @@ elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
 				Xtest = []; Yexact = [];
 				fclose(fid);
 				
+elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat(' ',1,length(dataset)-6), '.askit'] == dataset) == 6
+
+				disp(['Reading in ', dataset]);
+				Xtrain = load([dir,dataset]);
+				Ytrain = []; Yexact = []; Xtest = [];
+				[n,~] = size(Xtrain);
+
+				disp('Done loading data! (Test and training are the same, no Y)')
 else
 				disp('Error: Data not found - type help loaddata for options');
 end

@@ -8,9 +8,13 @@
 % covertype - 'covtype'
 % ijcnn1 - 'ijcnn1'
 % mnist8m - 'mnist8m' --> not yet working
+%
+%%%%%  ------- %%%%%%%%
+% ANY .askit FILE - GIVE EXACT FILE NAME
+%%%%%  ------- %%%%%%%%
 
 % Load data
-file = 'ijcnn1';
+file = 'gaussian_16d_100K.askit';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
 tic;
@@ -38,19 +42,33 @@ disp('-----Estimate norm------')
 %tic;
 %est_norm = Estimate2Norm(matvec, num_norm_samples, N);
 %toc
+
 smpidx = randperm(N);
 smpidx = smpidx(1:norm_sample_size);
-tic;
 w = ones(N,1)./sqrt(N);
-estKw = U(smpidx,:) * ( L.* (U'*w));
+uw = L.*(U'*w);
+
+tic; 
+%newN = norm_sample_size/10;
+%numerator = 0;
+%denom = 0;
+%for i = 1:10
+%				sidx = smpidx(((i-1)*newN+1):i*newN);
+%				estKw = U(sidx,:) *uw;
+%				truKw = kernel(X(sidx,:),X,sigma)*w;
+%				numerator = numerator + norm(estKw - truKw)^2;
+%				denom = denom + norm(truKw)^2;				
+%end
+%rel_error = sqrt(numerator/denom);
+
+estKw = U(smpidx,:) * uw;
 truKw = kernel(X(smpidx,:),X,sigma)*w;
-rel_error = norm(estKw - truKw)/norm(truKw);
+rel_error = norm(truKw - estKw) / norm(truKw);
+
 toc
 
 % Output results
 fprintf('Rel error: %.15f\n', rel_error);
-%fprintf('Est norm: %.15f\n', est_norm);
-%fprintf('True norm: %.15f\n', true_norm);
 
 
 
