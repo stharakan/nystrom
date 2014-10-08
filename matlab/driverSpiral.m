@@ -10,7 +10,7 @@ close all
 filename = 'spiral_cs8000_n05';
 k = 6; % # of nearest neighbors
 labeled = 4000; % # of labeled points in each class 
-m = 1024; % size of smaller system to solve
+m = 256; % size of smaller system to solve
 cv_folds = 5; % # of cross-val folds
 
 disp('Loading training data ... ')
@@ -46,7 +46,7 @@ sample = createsample(Xtrain,m,Ytrain,'kmeans with classes');
 %%
 corners = zeros(size(sigmas));  % L-curve analysis
 gcv     = zeros(size(sigmas));       % generalized cross validation
-mpr   = zeros(size(sigmas));
+mpr   = zeros(size(sigmas));     % minimum product alphas.*res hack.
 
 gcv_d=[1:m]'; gcv_d=m-gcv_d;
 fprintf('----------------------------------------------------------------------------\n');

@@ -4,8 +4,9 @@ function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
 % 'spiral' - test/trainspiral_cs8000_n05
 % 'wine'   - winequality-red/white.csv
 
+
 if ~exist('labeled') %ignored for non-synthetic datasets
-				labeled = 0;
+			labeled = 0;
 end
 
 addpath(dir);
