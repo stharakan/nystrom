@@ -53,7 +53,7 @@ if(runs ~=1)
 								sidx = smpidx(((i-1)*newN+1):i*newN);
 								estKw = U(sidx,:) *uw;
 								truKw = kernel(X(sidx,:),X,sigma)*w;
-								rel_error = rel_error + sum(abs((estKw - truKw)./truKw));
+								rel_error = rel_error + sum(abs((estKw - truKw)./truKw))/norm_sample_size;
 				end
 else
 				estKw = U(smpidx,:) * uw;
