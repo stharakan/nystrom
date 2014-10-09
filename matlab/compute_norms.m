@@ -14,19 +14,20 @@
 %%%%%  ------- %%%%%%%%
 
 % Load data
-file = 'gaussian_16d_100K.askit';
+file = 'covtype_scaled_nocommas.askit';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
-tic;
+%tic;
 [X,~,~,~,~] = loaddata(file,dir);
-toc
+%toc
 
 [N,d] = size(X);
 nystrom_rank = 128;
 nystrom_m = 2*nystrom_rank;
-sample_method = 'random';
+sample_method = 'kmeans';
 sigma = sigma_given(file); 
 norm_sample_size = 1000;
+runs = 10;
 
 % create function handle
 disp('-----Nystrom decmp-------')
@@ -38,10 +39,6 @@ matvec = @(rhs) NystromMatVec(U, L, rhs);
 
 % Estimate Norms
 disp('-----Estimate norm------')
-%num_norm_samples = 10;
-%tic;
-%est_norm = Estimate2Norm(matvec, num_norm_samples, N);
-%toc
 
 smpidx = randperm(N);
 smpidx = smpidx(1:norm_sample_size);
@@ -49,22 +46,20 @@ w = ones(N,1)./sqrt(N);
 uw = L.*(U'*w);
 
 tic; 
-%newN = norm_sample_size/10;
-%numerator = 0;
-%denom = 0;
-%for i = 1:10
-%				sidx = smpidx(((i-1)*newN+1):i*newN);
-%				estKw = U(sidx,:) *uw;
-%				truKw = kernel(X(sidx,:),X,sigma)*w;
-%				numerator = numerator + norm(estKw - truKw)^2;
-%				denom = denom + norm(truKw)^2;				
-%end
-%rel_error = sqrt(numerator/denom);
-
-estKw = U(smpidx,:) * uw;
-truKw = kernel(X(smpidx,:),X,sigma)*w;
-rel_error = norm(truKw - estKw) / norm(truKw);
-
+if(runs ~=1)
+				rel_error = 0;
+				newN = norm_sample_size/runs;
+				for i = 1:runs
+								sidx = smpidx(((i-1)*newN+1):i*newN);
+								estKw = U(sidx,:) *uw;
+								truKw = kernel(X(sidx,:),X,sigma)*w;
+								rel_error = rel_error + sum(abs((estKw - truKw)./truKw);
+				end
+else
+				estKw = U(smpidx,:) * uw;
+				truKw = kernel(X(smpidx,:),X,sigma)*w;
+				rel_error = sum(abs((truKw - estKw)./truKw))/norm_sample_size;
+end
 toc
 
 % Output results

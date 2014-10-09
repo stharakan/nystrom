@@ -13,14 +13,16 @@ if isequal(dataset,'cpusmall')
 				sigma = sqrt(1/8);
 elseif isequal(dataset,'wine')
 				sigma = sqrt(2^9);
-elseif isequal(dataset,'susy')
+elseif strncmp(dataset,'susy',4)
 				sigma = 1.0;
-elseif isequal(dataset,'susy_scaled.askit')
-				sigma = sqrt(1/2);
-elseif isequal(dataset,'covtype') || isequal(dataset,'covtype_scaled.askit')
+elseif strncmp(dataset,'covtype',7);
 				sigma = sqrt(1/8);
-elseif isequal(dataset,'ijcnn1')
+elseif strncmp(dataset,'ijcnn',5)
 				sigma = sqrt(1/2);
+elseif isequal(dataset,'mnist2m_scaled_nocommas.askit')
+				sigma = 4.0;
+elseif isequal(dataset,'mnist8m_scaled_nocommas.askit')
+				sigma = 3.99;
 elseif isequal(dataset,'hypersphere_4d_100K.askit')
 				sigma = 0.2143;
 elseif isequal(dataset,'hypersphere_4d_1M.askit')
