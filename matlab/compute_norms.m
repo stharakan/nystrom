@@ -14,7 +14,7 @@
 %%%%%  ------- %%%%%%%%
 
 % Load data
-file = 'covtype_scaled_nocommas.askit';
+file = 'ijcnn_scaled_nocommas.askit';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
 %tic;
@@ -24,7 +24,7 @@ dir = '/org/groups/padas/lula_data/machine_learning/';
 [N,d] = size(X);
 nystrom_rank = 128;
 nystrom_m = 2*nystrom_rank;
-sample_method = 'kmeans';
+sample_method = 'random';
 sigma = sigma_given(file); 
 norm_sample_size = 1000;
 runs = 10;
@@ -53,7 +53,7 @@ if(runs ~=1)
 								sidx = smpidx(((i-1)*newN+1):i*newN);
 								estKw = U(sidx,:) *uw;
 								truKw = kernel(X(sidx,:),X,sigma)*w;
-								rel_error = rel_error + sum(abs((estKw - truKw)./truKw);
+								rel_error = rel_error + sum(abs((estKw - truKw)./truKw));
 				end
 else
 				estKw = U(smpidx,:) * uw;
