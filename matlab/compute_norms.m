@@ -14,20 +14,20 @@
 %%%%%  ------- %%%%%%%%
 
 % Load data
-file = 'ijcnn_scaled_nocommas.askit';
+file = 'susy_scaled.askit';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
-%tic;
+tic;
 [X,~,~,~,~] = loaddata(file,dir);
-%toc
+toc
 
 [N,d] = size(X);
 nystrom_rank = 128;
 nystrom_m = 2*nystrom_rank;
-sample_method = 'random';
+sample_method = 'kmeans';
 sigma = sigma_given(file); 
 norm_sample_size = 1000;
-runs = 10;
+runs = 1;
 
 % create function handle
 disp('-----Nystrom decmp-------')

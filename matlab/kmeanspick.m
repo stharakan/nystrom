@@ -30,9 +30,9 @@ end
 labcount = 0;
 for ii = 1:num_classes
     [clusters,~,~,dists] = kmeans(X(labcount+1:labcount+ll(ii),:), ...
-        clustsperclass(ii),'EmptyAction','singleton');
+        clustsperclass(ii),'EmptyAction','singleton','MaxIter',20);
     count = sum(clustsperclass(1:ii-1));
-    parfor jj = 1:clustsperclass(ii)
+    for jj = 1:clustsperclass(ii)
         [~,within_clust_idx] = min(dists(clusters == jj, jj));
         clust_idx = find(clusters == jj);
         idx(count+jj) = labcount + clust_idx(within_clust_idx);
