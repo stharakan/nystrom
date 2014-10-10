@@ -34,7 +34,7 @@ R =sqdist(A(rsmpind,:),A);
 num_impint  = ceil(sum(sqrt(R(:))<(4*H))/rsmp);
 fprintf('Interactions per point that cannot be truncated %d\n',num_impint);
 
-opts.eta = 0.10000; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
+opts.eta = 0.00000; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
 opts.noc = 15; % number of clusters(default 10)
 opts.kmeansits=10;
 %%

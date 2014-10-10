@@ -14,8 +14,12 @@ end
 if isempty(opts.eta)
 	opts.eta = 0.1;
 end
+if isempty(opts.kmeansits)
+        opts.kmeansits=40;
+end
 noc = opts.noc;
 eta = opts.eta;
+MaxIter = opts.kmeansits;
 [n,dim] = size(A);
 fprintf('***************************\n');
 fprintf('Parameters ...\n');
@@ -31,7 +35,7 @@ if n>10000,
 else
 	l = 1:n;
 end
-MaxIter = 10; % number of iterations in kmeans
+%MaxIter = 20; % number of iterations in kmeans
 % [idx1,centers] = mykmeans(A(l,:)',noc,MaxIter);
 [idx1,centers] = kmeans(A(l,:),noc,'MaxIter',4*MaxIter); centers=centers';
 dis = sqdist(A,centers');
