@@ -4,7 +4,7 @@
 % cpusmall - 'cpusmall' NEEDS TO BE SCALED!!
 % winequality - 'wine'
 % synthetic spiral - 'spiral'
-% SUSY - 'susy' 
+% SUSY - 'susy'
 % covertype - 'covtype'
 % ijcnn1 - 'ijcnn1'
 % mnist8m - 'mnist8m' --> not yet working
@@ -15,17 +15,24 @@
 
 % Load data
 file = 'susy_scaled.askit';
+nystrom_rank = 2048;
+sigma_choice = 4;
+flag = 1; % 0=data_loaded, 1=need to load
 dir = '/org/groups/padas/lula_data/machine_learning/';
 
-tic;
-[X,~,~,~,~] = loaddata(file,dir);
-toc
+if flag
+    clearvars -except dir sigma_choice nystrom_rank file
+    [X,~,~,~,~] = loaddata(file,dir);
+else
+    clearvars -except X dir sigma_choice nystrom_rank file
+    disp(['Using previously loaded data ', file]);
+end
 
 [N,d] = size(X);
-nystrom_rank = 128;
+X = single(X);
 nystrom_m = 2*nystrom_rank;
-sample_method = 'kmeans';
-sigma = sigma_given(file); 
+sample_method = 'random';
+sigma = sigma_given(file,sigma_choice);
 norm_sample_size = 1000;
 runs = 1;
 
@@ -45,36 +52,24 @@ smpidx = smpidx(1:norm_sample_size);
 w = ones(N,1)./sqrt(N);
 uw = L.*(U'*w);
 
-tic; 
 if(runs ~=1)
-				rel_error = 0;
-				newN = norm_sample_size/runs;
-				for i = 1:runs
-								sidx = smpidx(((i-1)*newN+1):i*newN);
-								estKw = U(sidx,:) *uw;
-								truKw = kernel(X(sidx,:),X,sigma)*w;
-								rel_error = rel_error + sum(abs((estKw - truKw)./truKw))/norm_sample_size;
-				end
+    rel_error = 0;
+    newN = norm_sample_size/runs;
+    for i = 1:runs
+        sidx = smpidx(((i-1)*newN+1):i*newN);
+        estKw = U(sidx,:) *uw;
+        truKw = kernel(X(sidx,:),X,sigma)*w;
+        rel_error = rel_error + sum(abs((estKw - truKw)./truKw))/norm_sample_size;
+    end
 else
-				estKw = U(smpidx,:) * uw;
-				truKw = kernel(X(smpidx,:),X,sigma)*w;
-				rel_error = sum(abs((truKw - estKw)./truKw))/norm_sample_size;
+    estKw = U(smpidx,:) * uw;
+    truKw = kernel(X(smpidx,:),X,sigma)*w;
+    rel_error = sum(abs((truKw - estKw)./truKw))/norm_sample_size;
 end
-toc
 
 % Output results
+fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 fprintf('Rel error: %.15f\n', rel_error);
-
-
-
-
-
-
-
-
-
-
-
 
 
 
