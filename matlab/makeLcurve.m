@@ -24,7 +24,7 @@ for ii = 1:numsigs
 	%Eigendecompose inner matrix R L R' = Qs S Qs', diagonalize
 	[Qs,S] = eig(R*diag(L)*R');
 	S = diag(S);
-  spectra(:,ii) = S;
+    spectra(:,ii) = S;
   
 % 	disp(['Highest eval of s: ', num2str(S(1))]);
 % 	disp(['Lowest eval of s : ', num2str(S(end))]);
