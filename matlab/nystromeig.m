@@ -39,8 +39,9 @@ idx_m = sample;
 % xnorms = sum(X.*X,2); % n x 1 vector of square norms of X
 % K_nm1 = exp(-(repmat(xnorms,1,m) + repmat(xnorms(idx_m)',n,1) ...
 %     - 2.*X*X(idx_m,:)')./(2*sigma^2));
-
 K_nm=kernel(X,X(sample,:),sigma);
+
+
 
 
 % [Um,Lm] = eig(K_nm(idx_m,:));
@@ -49,12 +50,18 @@ K_nm=kernel(X,X(sample,:),sigma);
 % 
 % Un = (sqrt(n/m)).*((K_nm*Um(:,m:-1:m-p+1))*(diag(1./Ln)));
 
-
 [Um,Lm,~]=svd(K_nm(idx_m,:));
-Ln = n/m*diag(Lm);
-Un=sqrt(n/m)*(K_nm*Um)*diag(1./Ln);
+
+nm = single(n/m);
+Ln = nm.*diag(Lm);
+clear Lm
 
 Ln = Ln(1:p);
-Un = Un(:,1:p);
+Um = Um(:,1:p);
+Um = Um*diag(sqrt(nm)./Ln);
+Un= K_nm*Um;
+
+%Ln = Ln(1:p);
+%Un = Un(:,1:p);
 
 end
