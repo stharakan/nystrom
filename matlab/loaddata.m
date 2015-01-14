@@ -101,7 +101,7 @@ elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
 elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat(' ',1,length(dataset)-6), '.askit'] == dataset) == 6
 
 				disp(['Reading in ', dataset]);
-				Xtrain = load([dir,dataset]);
+                                Xtrain = load([dir,dataset]);
 				Ytrain = []; Yexact = []; Xtest = [];
 				[n,~] = size(Xtrain);
 
