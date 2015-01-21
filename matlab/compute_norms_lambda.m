@@ -15,18 +15,26 @@ else
     clearvars -except X Y file sample lambda U L 
     disp(['Using previously loaded data ', file]);
 end
+X = scale_to_one(X);
 
 %% Specify other parameters
 nystrom_rank = 256;
-sigma_choice = 3;
+sigma_choice = 1;
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
-norm_sample_size = 500;
+norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
 sigma = sigma_given(file,sigma_choice)
 
+%% Select Lambda
+disp('------Lambda Cross-Val------');
+tic;
+[lambda,spectrum,errors] = cv_lambda(X,Y,sigma,nystrom_rank);
+max(errors)
+toc;
+%rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
 %% Full Nystrom decomposition
 disp('-----Nystrom decmp-------')
@@ -53,14 +61,7 @@ end
 
 matvec = @(rhs) NystromMatVec(U, L, rhs);
 
-%% Select Lambda
-disp('------Lambda Cross-Val------');
-tic;
-[lambda,errors] = cv_lambda(X,Y,sigma,nystrom_rank);
-min(errors)
-max(errors)
-toc;
-rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
+
 
 %% Estimate Errors
 disp('-----Estimating kernel approx error------')
@@ -90,7 +91,7 @@ fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 fprintf('Rel error: %.15f\n', rel_error);
 
 
-if ~isempty('Xtest') || ~isempty('Ytest')
+if ~(isempty(Xtest) || isempty(Ytest))
     disp('-----Estimating test set errors------');    
     Ktest = kernel(Xtest,X,sigma);
     
