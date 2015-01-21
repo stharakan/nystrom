@@ -56,7 +56,7 @@ matvec = @(rhs) NystromMatVec(U, L, rhs);
 %% Select Lambda
 disp('------Lambda Cross-Val------');
 tic;
-lambda = cv_lambda(X,Y,sigma,nystrom_rank); %NEED TO WRITE
+lambda = cv_lambda(X,Y,sigma,nystrom_rank);
 toc;
 rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 

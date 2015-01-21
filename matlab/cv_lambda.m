@@ -18,7 +18,7 @@ bigs = mod(N,FOLDS);
 fold_sizes(1:bigs) = ceil(N/FOLDS);
 fold_sizes(bigs+1:end) = floor(N/FOLDS);
 shuffled = randperm(N);
-sample = 1:nystrom_m - fold_sizes(1);
+sample = 1:fold_sizes(1) - fold_sizes(1);
 
 
 %% Specify lambda choices
@@ -44,10 +44,12 @@ for i = 1:FOLDS
     D = diag(D);
     Q = Qb*Qs;
     
-    y = Y(sample);
+    trainy = Y(curr_idx);
     qy = (Q'*y)./D;
-    base_res = norm(y - Q*qy,2)^2;
     
+    Ktest = kernel(X(sample, :), X(curr_idx,:), sigma);
+    testy = Y(sample);
+        
     dcount = length(D); 
     for j = 1:length(spectrum)
         %Figure out last value to include
@@ -55,14 +57,14 @@ for i = 1:FOLDS
             dcount = dcount - 1;
             if dcount == 0, break; end;
         end
-        
-        errors(j) = errors(j) + sqrt((base_res + norm(qy(dcount+1:end),2)^2));
+        esty = Ktest*Q(:,1:dcount)*qy(1:dcount);
+        errors(j) = errors(j) + norm(esty-testy);
         
     end
 
 end
 
-errors./FOLDS;
+errors = errors./FOLDS;
 lambda = min(errors);
 
 
