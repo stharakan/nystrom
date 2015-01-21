@@ -1,8 +1,11 @@
-function [a_norms, residuals, spectra] = makeLcurve(X,Y,m,sigmas,sample)
+function [a_norms, residuals, spectra] = makeLcurve(X,Y,m,sigmas,sample,flag)
 %MAKELCURVE creates an L-curve for each value of sigma, comparing
 %the norm of the residual with the norm of alpha. 
 
 %Initialize
+if ~exists(flag)
+    flag = 1;
+end
 numsigs = length(sigmas);
 [n,~] = size(X);
 a_norms = zeros(m,numsigs);
@@ -38,14 +41,16 @@ for ii = 1:numsigs
 	%Compute the minimum possible residual (i.e. dist(Y, span(Q * Qs)))
 	base_res = norm(Y - Q*Qs*qy,2)^2;
 
-	%Corresponds to using jj eigenvalues of S to solve
-	for jj = 1:m
-		%||alpha_jj|| = ||Qs_jj' Q' alpha_jj|| = ||S_jj^-1 Qs_jj' Q' Y ||
-		a_norms(jj,ii) = norm(s_qy(1:jj),2);
-		
-		%||K alpha_jj - Y|| = sqrt(base error^2 + in_space error^2) 
-		residuals(jj,ii) = sqrt((base_res + norm(qy(jj+1:end),2)^2)/n);
-	end
+    %Corresponds to using jj eigenvalues of S to solve
+    if flag
+        for jj = 1:m
+            %||alpha_jj|| = ||Qs_jj' Q' alpha_jj||=||S_jj^-1 Qs_jj' Q' Y||
+            a_norms(jj,ii) = norm(s_qy(1:jj),2);
+            
+            %||K alpha_jj - Y|| = sqrt(base error^2 + in_space error^2)
+            residuals(jj,ii) = sqrt((base_res + norm(qy(jj+1:end),2)^2)/n);
+        end
+    end
 end
 disp('All curves made');
 
