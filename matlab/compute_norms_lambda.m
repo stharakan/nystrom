@@ -56,7 +56,9 @@ matvec = @(rhs) NystromMatVec(U, L, rhs);
 %% Select Lambda
 disp('------Lambda Cross-Val------');
 tic;
-lambda = cv_lambda(X,Y,sigma,nystrom_rank)
+[lambda,errors] = cv_lambda(X,Y,sigma,nystrom_rank);
+min(errors)
+max(errors)
 toc;
 rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
@@ -88,13 +90,19 @@ fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 fprintf('Rel error: %.15f\n', rel_error);
 
 
-if exist('Xtest') && exist('Ytest')
-    disp('-----Estimating test set errors------');
+if ~isempty('Xtest') || ~isempty('Ytest')
+    disp('-----Estimating test set errors------');    
+    Ktest = kernel(Xtest,X,sigma);
     
-    %Get alpha
 
     %Absolute, relative with approx computation
-    
+    [Qb,R] = qr(U,0);
+    [Qs,Ls] = eig(R*L*R');
+    Q = Qb*Qs;
+    w = Q*Ls*Q'*Y;
+    Yguess = Ktest*w;
+    absErr_approx = norm(Yguess - Ytest)
+    relErr_approx = absErr_approx/(norm(Ytest))
     
     %Absolute, relative with exact computation
     
