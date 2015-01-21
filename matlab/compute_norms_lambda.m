@@ -4,7 +4,7 @@
 
 %% File load parameters(if necessary)
 flag = 1; % 0=data_loaded, 1=need to load
-file = 'covtype';
+file = 'covtype_libsvm';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
 
@@ -17,8 +17,8 @@ else
 end
 
 %% Specify other parameters
-nystrom_rank = 256;
-sigma_choice = 1;
+nystrom_rank = 512;
+sigma_choice = 2;
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
@@ -30,9 +30,9 @@ sigma = sigma_given(file,sigma_choice);
 %% Select Lambda
 disp('------Lambda Cross-Val------');
 tic;
-[lambda,spectrum,error] = cv_lambda(X,Y,sigma,nystrom_rank);
+[lambda,spectrum,err] = cv_lambda(X,Y,sigma,nystrom_rank);
 toc;
-disp('Lamba chosen: %4.4f; Associated error: %2.5d\n', lambda, error);
+disp('Lamba chosen: %4.4f; Associated error: %2.5d\n', lambda, err);
 %rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
 %% Full Nystrom decomposition

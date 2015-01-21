@@ -100,7 +100,7 @@ elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
     Xtest = []; Yexact = [];
     fclose(fid);
     
-elseif sum([repmat(' ',1,length(dataset) -7), '_libsvm'] == dataset) == 6
+elseif sum([repmat(' ',1,length(dataset) -7), '_libsvm'] == dataset) == 7
     disp(['Reading in ', dataset]);
     Xtrain = load([dir,dataset,'_train_askit']);
     Ytrain = load([dir,dataset,'_train_askit_labels']);
