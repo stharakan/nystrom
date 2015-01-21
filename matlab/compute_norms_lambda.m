@@ -10,7 +10,7 @@ dir = '/org/groups/padas/lula_data/machine_learning/';
 
 if flag
     clearvars -except dir file sample lambda U L
-    [X,Y,~,~,~] = loaddata(file,dir);
+    [X,Y,Xtest,Ytest,~] = loaddata(file,dir);
 else
     clearvars -except X Y file sample lambda U L 
     disp(['Using previously loaded data ', file]);
@@ -22,7 +22,7 @@ sigma_choice = 3;
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
-norm_sample_size = 1000;
+norm_sample_size = 500;
 runs = 1;
 sample_method = 'random';
 sigma = sigma_given(file,sigma_choice)
@@ -56,20 +56,13 @@ matvec = @(rhs) NystromMatVec(U, L, rhs);
 %% Select Lambda
 disp('------Lambda Cross-Val------');
 tic;
-lambda = cv_lambda(X,Y,sigma,nystrom_rank);
+lambda = cv_lambda(X,Y,sigma,nystrom_rank)
 toc;
 rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
 %% Estimate Errors
 disp('-----Estimating kernel approx error------')
 %Relative
-
-disp('-----Estimating test set errors------');
-%Absolute, relative with approx computation
-%Absolute, relative with exact computation
-
-
-
 smpidx = randperm(N);
 smpidx = smpidx(1:norm_sample_size);
 w = ones(N,1)./sqrt(N);
@@ -93,6 +86,23 @@ end
 % Output results
 fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 fprintf('Rel error: %.15f\n', rel_error);
+
+
+if exist('Xtest') && exist('Ytest')
+    disp('-----Estimating test set errors------');
+    
+    %Get alpha
+
+    %Absolute, relative with approx computation
+    
+    
+    %Absolute, relative with exact computation
+    
+else
+    disp('No test set comparison available.');
+
+end
+
 
 
 
