@@ -32,15 +32,17 @@ spectrum = spectrum(end:-1:1);
 errors = zeros(size(spectrum));
 
 for i = 1:FOLDS
+	disp(['Working fold ', num2str(i)]);
     sample = sample + fold_sizes(i);
     curr_idx = diff(1:N,sample);
     curr_idx = shuffled(curr_idx);
     
     curr_sample = createsample(X(curr_idx,:),nystrom_m,[],'random');
-    [U, L] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
+    disp('Running nystrom...');
+	[U, L] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
     
     [Qb,R] = qr(U,0);
-    [Qs,D] = eig(R*L*R');
+    [Qs,D] = eig(R*diag(L)*R');
     D = diag(D);
     Q = Qb*Qs;
     
@@ -51,15 +53,24 @@ for i = 1:FOLDS
     testy = Y(sample);
         
     dcount = length(D); 
-    for j = 1:length(spectrum)
-        %Figure out last value to include
-        while D(dcount) < spectrum(j)
-            dcount = dcount - 1;
-            if dcount == 0, break; end;
-        end
-        esty = Ktest*Q(:,1:dcount)*qy(1:dcount);
-        errors(j) = errors(j) + norm(esty-testy);
-        
+	old_err = 0;
+	disp('Recording errors...');
+	for j = 1:length(spectrum)
+		%Figure out last value to include
+		if D(dcount) < spectrum(j)
+			while D(dcount) < spectrum(j)
+				dcount = dcount - 1;
+				if dcount == 0, break; 
+				end;
+			end	
+			
+			esty = Ktest*Q(:,1:dcount)*qy(1:dcount);
+			old_err = norm(esty-testy);
+			errors(j) = errors(j) + old_err;
+		else
+			errors(j) = errors(j) + old_err;
+		end
+
     end
 
 end

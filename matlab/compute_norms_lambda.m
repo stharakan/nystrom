@@ -12,7 +12,7 @@ if flag
     clearvars -except dir file sample lambda U L
     [X,Y,~,~,~] = loaddata(file,dir);
 else
-    clearvars -except X file sample lambda U L 
+    clearvars -except X Y file sample lambda U L 
     disp(['Using previously loaded data ', file]);
 end
 
