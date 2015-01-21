@@ -8,10 +8,12 @@ function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
 % 'ijcnn1' - unscaled ijcnn1
 % 'cpusmall' - unscaled cpusmall
 %
-%%%%%  ------- %%%%%%%%
+%%%%% -------- %%%%%%%%
 % ANY .askit FILE - GIVE EXACT FILE NAME
-%%%%%  ------- %%%%%%%%
-
+%%%%% -------- %%%%%%%%
+%%%%% -------- %%%%%%%%
+% ICML datasets pass only part of name up to _libsvm
+%%%%% -------- %%%%%%%%
 
 
 if ~exist('labeled') %ignored for non-synthetic datasets
@@ -98,8 +100,17 @@ elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
     Xtest = []; Yexact = [];
     fclose(fid);
     
-elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat(' ',1,length(dataset)-6), '.askit'] == dataset) == 6
-    
+elseif sum([repmat(' ',1,length(dataset) -7), '_libsvm'] == dataset) == 6
+    disp(['Reading in ', dataset]);
+    Xtrain = load([dir,dataset,'_train_askit']);
+    Ytrain = load([dir,dataset,'_train_askit_labels']);
+    Xtest = load([dir,dataset,'_test_askit']);
+    Yexact = load([dir,dataset,'_test_askit_labels']);
+    [n1, ~] = size(Xtrain); [n2, ~] = size(Xtest);
+    n = n1+n2;
+    disp('Done loading data! (Training and test loaded)');
+
+elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat(' ',1,length(dataset)-6), '.askit'] == dataset) == 6    
     disp(['Reading in ', dataset]);
     Xtrain = load([dir,dataset]);
     Ytrain = []; Yexact = []; Xtest = [];
