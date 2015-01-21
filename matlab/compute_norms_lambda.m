@@ -1,5 +1,5 @@
 %%%%%  ------- %%%%%%%%
-% ANY .askit FILE - GIVE EXACT FILE NAME
+% ANY libsvm FILE - GIVE FILE UP TO _libsvm
 %%%%%  ------- %%%%%%%%
 
 %% File load parameters(if necessary)
@@ -12,10 +12,9 @@ if flag
     clearvars -except dir file sample lambda U L
     [X,Y,Xtest,Ytest,~] = loaddata(file,dir);
 else
-    clearvars -except X Y file sample lambda U L 
+    clearvars -except X Y Xtest Ytest file sample lambda U L 
     disp(['Using previously loaded data ', file]);
 end
-X = scale_to_one(X);
 
 %% Specify other parameters
 nystrom_rank = 256;
@@ -26,14 +25,14 @@ nflag = 1; %0=nystrom computed, 1=generate new
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
-sigma = sigma_given(file,sigma_choice)
+sigma = sigma_given(file,sigma_choice);
 
 %% Select Lambda
 disp('------Lambda Cross-Val------');
 tic;
-[lambda,spectrum,errors] = cv_lambda(X,Y,sigma,nystrom_rank);
-max(errors)
+[lambda,spectrum,error] = cv_lambda(X,Y,sigma,nystrom_rank);
 toc;
+disp('Lamba chosen: %4.4f; Associated error: %2.5d\n', lambda, error);
 %rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
 %% Full Nystrom decomposition
