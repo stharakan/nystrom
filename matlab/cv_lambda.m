@@ -55,20 +55,23 @@ for i = 1:FOLDS
    	
 	subsample = sample(1:test_length);
     Ktest = kernel(X(subsample, :), X(curr_idx,:), sigma);
+    KQ = Ktest*Q;
+    clear Ktest Q
     testy = Y(subsample);
-        
+    normtest = norm(testy);    
     dcount = length(D);
     old_err = 0; old_length =0;
+    
     disp('Recording errors...');
     for j = 1:length(spectrum)
 		%Figure out last value to include
 		d = D(D>spectrum(j));
-		if length(d) > 0 & old_length ~= length(d)
-			esty = Ktest*Q(:,1:length(d))*qy(1:length(d));
-			norm(esty);
-			old_err = norm(esty-testy);
+        dcount = length(dcount);
+		if dcount > 0 && old_length ~= dcount
+			esty = KQ(:,1:dcount)*qy(1:dcount);
+			old_err = norm(esty-testy)/normtest;
 			old_length = length(d);
-		elseif length(d) > 0 & old_length == length(d)
+		elseif dcount > 0 && old_length == dcount
 			%don't need to do anything here
 		else
 			old_err = norm(testy);
