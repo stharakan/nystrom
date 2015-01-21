@@ -1,9 +1,9 @@
-r%%%%%  ------- %%%%%%%%
+%%%%%  ------- %%%%%%%%
 % ANY .askit FILE - GIVE EXACT FILE NAME
 %%%%%  ------- %%%%%%%%
 
 %% File load parameters(if necessary)
-flag = 0; % 0=data_loaded, 1=need to load
+flag = 1; % 0=data_loaded, 1=need to load
 file = 'covtype_scaled.askit';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 dir ='/h2/sameer/Documents/research/nystrom/';
@@ -44,7 +44,7 @@ if nflag
         disp('Using previous sample');
     end
     
-    [U, L] = nystromeig(X, sigma, sample,nystrom_rank);
+    [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
     
     toc
 else

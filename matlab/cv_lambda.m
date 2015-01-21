@@ -37,7 +37,7 @@ for i = 1:FOLDS
     curr_idx = shuffled(curr_idx);
     
     curr_sample = createsample(X(curr_idx,:),nystrom_m,[],'random');
-    [U, L] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank);
+    [U, L] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
     
     [Qb,R] = qr(U,0);
     [Qs,D] = eig(R*L*R');
