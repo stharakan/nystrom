@@ -47,7 +47,7 @@ for i = 1:FOLDS
     Q = Qb*Qs;
     
     trainy = Y(curr_idx);
-    qy = (Q'*y)./D;
+    qy = (Q'*trainy)./D;
     
     Ktest = kernel(X(sample, :), X(curr_idx,:), sigma);
     testy = Y(sample);
