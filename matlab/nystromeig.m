@@ -55,7 +55,7 @@ K_nm=kernel(X,X(sample,:),sigma);
 
 [Um,Lm,~]=svd(K_nm(idx_m,:));
 
-nm = single(n/m);
+nm = n/m;
 Ln = nm.*diag(Lm);
 clear Lm
 

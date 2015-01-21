@@ -4,13 +4,13 @@
 
 %% File load parameters(if necessary)
 flag = 1; % 0=data_loaded, 1=need to load
-file = 'covtype_scaled.askit';
+file = 'covtype';
 dir = '/org/groups/padas/lula_data/machine_learning/';
-dir ='/h2/sameer/Documents/research/nystrom/';
+%dir ='/h2/sameer/Documents/research/nystrom/';
 
 if flag
     clearvars -except dir file sample lambda U L
-    [X,~,~,~,~] = loaddata(file,dir);
+    [X,Y,~,~,~] = loaddata(file,dir);
 else
     clearvars -except X file sample lambda U L 
     disp(['Using previously loaded data ', file]);
@@ -31,7 +31,7 @@ sigma = sigma_given(file,sigma_choice)
 %% Full Nystrom decomposition
 disp('-----Nystrom decmp-------')
 [N,d] = size(X);
-X = single(X);
+%X = single(X);
 nystrom_m = 2*nystrom_rank;
 
 if nflag
