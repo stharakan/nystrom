@@ -32,7 +32,7 @@ disp('------Lambda Cross-Val------');
 tic;
 [lambda,spectrum,err] = cv_lambda(X,Y,sigma,nystrom_rank);
 toc;
-disp('Lamba chosen: %4.4f; Associated error: %2.5d\n', lambda, err);
+disp(['Lamba chosen: ',num2str(lambda),'; Associated error: ', num2str(err)]);
 %rmatvec = @(rhs) RegNystromMatVec(U,L,lambda,rhs);
 
 %% Full Nystrom decomposition
@@ -92,17 +92,18 @@ fprintf('Rel error: %.15f\n', rel_error);
 
 if ~(isempty(Xtest) || isempty(Ytest))
     disp('-----Estimating test set errors------');    
-    Ktest = kernel(Xtest,X,sigma);
+    Ktest = kernel(Xtest(smpidx,:),X,sigma);
     
 
     %Absolute, relative with approx computation
     [Qb,R] = qr(U,0);
     [Qs,Ls] = eig(R*L*R');
     Q = Qb*Qs;
+	clear Qb Qs R
     w = Q*Ls*Q'*Y;
     Yguess = Ktest*w;
-    absErr_approx = norm(Yguess - Ytest)
-    relErr_approx = absErr_approx/(norm(Ytest))
+    absErr_approx = norm(Yguess - Ytest(smpidx))
+    relErr_approx = absErr_approx/(norm(Ytest(smpidx)))
     
     %Absolute, relative with exact computation
     
