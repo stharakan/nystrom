@@ -117,6 +117,13 @@ elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat('
     [n,~] = size(Xtrain);
     
     disp('Done loading data! (Test and training are the same, no Y)')
+    
+elseif isequal(dataset,'HIGGS.csv')
+    Xtrain = load([dir,dataset]);
+    Ytrain = Xtrain(:,1);
+    Xtrain = Xtrain(:,2:end);
+    Xtest = []; Yexact= [];
+    [n,~] = size(Xtrain);
 else
     disp('Error: Data not found - type help loaddata for options');
 end
