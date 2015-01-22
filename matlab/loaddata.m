@@ -7,6 +7,7 @@ function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
 % 'covtype' - unscaled covtype
 % 'ijcnn1' - unscaled ijcnn1
 % 'cpusmall' - unscaled cpusmall
+% 'HIGGS.csv' - unscaled Higgs
 %
 %%%%% -------- %%%%%%%%
 % ANY .askit FILE - GIVE EXACT FILE NAME
