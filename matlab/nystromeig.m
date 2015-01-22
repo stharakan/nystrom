@@ -29,29 +29,7 @@ end
 
 idx_m = sample;
 
-% %random choice
-% if strcmp(pick,'random')
-%     idx_m = randpick(m,n);
-% elseif n==m
-%   idx_m = [1:n]';
-% %kmeans
-% else strcmp(pick,'kmeans')
-%     idx_m = kmeanspick(X,m,ll);
-% end
-
-% xnorms = sum(X.*X,2); % n x 1 vector of square norms of X
-% K_nm1 = exp(-(repmat(xnorms,1,m) + repmat(xnorms(idx_m)',n,1) ...
-%     - 2.*X*X(idx_m,:)')./(2*sigma^2));
 K_nm=kernel(X,X(sample,:),sigma);
-
-
-
-
-% [Um,Lm] = eig(K_nm(idx_m,:));
-% Ln = (n/m).*diag(Lm);
-% Ln = Ln(m:-1:m-p+1);
-% 
-% Un = (sqrt(n/m)).*((K_nm*Um(:,m:-1:m-p+1))*(diag(1./Ln)));
 
 [Um,Lm,~]=svd(K_nm(idx_m,:));
 
@@ -67,9 +45,5 @@ if flag
 else
     Un = 0;
 end
-
-
-%Ln = Ln(1:p);
-%Un = Un(:,1:p);
 
 end
