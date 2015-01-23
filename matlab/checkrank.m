@@ -2,25 +2,36 @@ clear all; clear globals;
 N = 100000; % 
 M = 1000; % 
 dim = 10;      % dimension
-rescale  = true;
+rescale  = ~true;
 loadfile = true;
 
 %dir = '/org/groups/padas/lula_data/machine_learning/';
 dir = '~/data/machine_learning/';
 file = {'covtype','susy','mnist2m_scaled.askit','ijcnn.askit','mnist8m_scaled_nocommas.askit'};
-if loadfile, P=single(loaddata(file{4},dir)); end;
+if loadfile, P=single(loaddata(file{3},dir)); end;
 if rescale, P=scale_to_one(P); end
 
 [N,dim]=size(P); 
+%%
+M=4096*2;
 Q=P(unique(randi(N,M,1)),:);
 %P = randn(dim,N); 
 %Q = randn(dim,M);
 %%
-H = SC*silverman(dim,N);
-fprintf('Actual bandwidth is %g\n',H);
-H=4;
-fprintf('Bandwidth H= %g, SC=%1.2f\n',H,SC);
+%H = SC*silverman(dim,N);
+%fprintf('Actual bandwidth is %g\n',H);
+H=2;
+%fprintf('Bandwidth H= %g, SC=%1.2f\n',H,SC);
 gaussian = @(r) exp(-1/2 * r.^2);
+%%
+% estimate rank of global matrix: (Nystrom sampling)
+D=distance(Q',Q');
+G=gaussian(D/H);
+s=svd(G); s = N/M * s; % N/M corrects for sampling size);
+%%
+
+
+
 rho = 4;
 
 P0 = Q(:,randi(M,1)); 

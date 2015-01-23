@@ -1,7 +1,7 @@
-%clear all; close all;
+clear all; close all;
 addpath meka
-%dir = '~/data/machine_learning/';
-dir = '/org/groups/padas/lula_data/machine_learning/';
+dir = '~/data/machine_learning/';
+%dir = '/org/groups/padas/lula_data/machine_learning/';
 
 rescale = true;
 save_scaled_to_file = ~true;
@@ -12,7 +12,7 @@ if 1
 file = 'covtype';
 %file ='ijcnn';
 %file = 'susy';
-%A=loaddata(file,dir);
+A=loaddata(file,dir);
 %A=randn(1000000,16);  16D dimensionals gamma 1/2/0.45/0.45
 %A = randn(1e6,64); % gamma = 2.62
 
@@ -28,7 +28,7 @@ end
 k =256; % target rank
 gamma = 1; H = 1/sqrt(2*gamma);
 H=0.22; gamma=1/2/H/H;
-rsmp = 1000; % sample several rows in K to measure kernel approximation error
+rsmp = 2048; % sample several rows in K to measure kernel approximation error
 rsmpind = randsample(1:n,rsmp); 
 R =sqdist(A(rsmpind,:),A);
 num_impint  = ceil(sum(sqrt(R(:))<(4*H))/rsmp);
