@@ -53,7 +53,7 @@ matvec = @(rhs) NystromMatVec(U, L, rhs);
 % Estimate Norms
 disp('-----Estimate norm------')
 if eflag
-	[abs_error, rel_error] = matvec_errors(U,L,norm_sample_size,1);
+	[abs_error, rel_error] = matvec_errors(X,U,L,sigma,norm_sample_size,1);
 	% Output results
 	fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 	fprintf('Rel error: %.15f\n', rel_error);

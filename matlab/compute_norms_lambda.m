@@ -7,7 +7,7 @@ flag = 1; % 0=data_loaded, 1=need to load
 file = 'covtype_libsvm';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
-dir = '/work/00921/biros/maverick/data/machine_learning/';
+%dir = '/work/00921/biros/maverick/data/machine_learning/';
 
 if flag
     clearvars -except dir file sample lambda U L
@@ -18,12 +18,12 @@ else
 end
 
 %% Specify other parameters
-nystrom_rank = 512;
+nystrom_rank = 1024;
 sigma_choice = 2;
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
-cvflag = 0; 
+cvflag = 1; 
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
@@ -76,7 +76,7 @@ disp('-----Estimating kernel approx error------')
 
 %Mat-vec error
 tic;
-[abs_err_mv,rel_err_mv] = matvec_errors(X,U,L,norm_sample_size,runs); 
+[abs_err_mv,rel_err_mv] = matvec_errors(X,U,L,sigma,norm_sample_size,runs); 
 toc
 
 % Output results

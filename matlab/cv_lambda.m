@@ -66,7 +66,7 @@ for i = 1:FOLDS
     for j = 1:length(spectrum)
 		%Figure out last value to include
 		d = D(D>spectrum(j));
-        dcount = length(dcount);
+        dcount = length(d);
 		if dcount > 0 && old_length ~= dcount
 			esty = KQ(:,1:dcount)*qy(1:dcount);
             old_err = norm(esty-testy);

@@ -1,4 +1,4 @@
-function [abs_error, rel_error] = matvec_errors(X,U,L,norm_sample_size,runs)
+function [abs_error, rel_error] = matvec_errors(X,U,L,sigma,norm_sample_size,runs)
 
 if ~exist('norm_sample_size')
 	norm_sample_size = 1000;
