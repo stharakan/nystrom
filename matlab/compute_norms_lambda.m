@@ -85,29 +85,19 @@ fprintf('Rel error: %.15f\n', rel_err_mv);
 
 if ~(isempty(Xtest) || isempty(Ytest))
     disp('-----Estimating test set errors------');    
-   	tic; 
-	[Ntest,~] = size(Xtest);
-	smpidx = randperm(Ntest);
-	smpidx = smpidx(1:norm_sample_size);
-    Ktest = kernel(Xtest(smpidx,:),X,sigma);
-
-    %Absolute, relative with approx computation
-    [Qb,R] = qr(U,0);
-    [Qs,Ls] = eig(R*diag(L)*R');
-    Q = Qb*Qs;
-	clear Qb Qs R
-    w = Q'*Y;
-    Ls = diag(Ls);
-	reg = sum(Ls>lambda);
-	Ls = Ls(1:reg);
-	lw = w(1:reg)./Ls;
-	w = Q(:,1:reg)*lw;
-	
-	Yguess = Ktest*w;
-    absErr_approx = norm(Yguess - Ytest(smpidx))
-    relErr_approx = absErr_approx/(norm(Ytest(smpidx)))
+   	tic;
+    %orthogonalize
+    [Q,D] = nystromorth(U,L);
+    
+    %find weight vector
+    w = find_weights(Q,D,Y,lambda);
+    
+    %compute errors
+    [absErr_approx, relErr_approx] = regress_errors(X,Y,Xtest,Ytest,weights,sigma,norm_sample_size);
 	toc
     
+    absErr_approx
+    relErr_approx
     %Absolute, relative with exact computation
     
 else
