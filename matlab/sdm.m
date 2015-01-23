@@ -9,10 +9,10 @@ whiten_data = ~true;
 
 if 1
 %load ijcnn.mat;% input data matrix A should be sparse matrix with size n by d
-file = 'covtype';
+file = 'covtype_libsvm';
 %file ='ijcnn';
 %file = 'susy';
-A=loaddata(file,dir);
+[A,Y,Atest,Ytest,~]=loaddata(file,dir);
 %A=randn(1000000,16);  16D dimensionals gamma 1/2/0.45/0.45
 %A = randn(1e6,64); % gamma = 2.62
 
@@ -34,9 +34,9 @@ R =sqdist(A(rsmpind,:),A);
 num_impint  = ceil(sum(sqrt(R(:))<(4*H))/rsmp);
 fprintf('Interactions per point that cannot be truncated %d\n',num_impint);
 
-opts.eta = 0.00000; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
-opts.noc = 15; % number of clusters(default 10)
-opts.kmeansits=10;
+opts.eta = 0.1; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
+opts.noc = 10; % number of clusters(default 10)
+opts.kmeansits=15;
 %%
 %==================== obtain the approximation U and S(K \approx U*S*U^T)
 t = cputime;
@@ -58,5 +58,19 @@ ex = tmpK*w;
 up = Kapp(w);
 Errs = mean(abs(ex-up)./abs(ex))
 
-%Err = norm(tmpK-Kapp,'fro')/norm(tmpK,'fro');
 fprintf('The relative approximation error is %.1e (sample)\n',Errs);
+
+
+% Test regression
+weights = get_weight(U,L,Y,0);
+[abs_err,rel_err] = regression_test(A,Atest,Ytest, weights, sigma)
+
+
+
+
+
+
+
+
+
+
