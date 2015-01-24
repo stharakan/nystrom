@@ -7,7 +7,7 @@ flag = 1; % 0=data_loaded, 1=need to load
 file = 'covtype_libsvm';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
-%dir = '/work/00921/biros/maverick/data/machine_learning/';
+dir = '/work/00921/biros/maverick/data/machine_learning/';
 
 if flag
     clearvars -except dir file sample lambda U L
@@ -93,7 +93,7 @@ if ~(isempty(Xtest) || isempty(Ytest))
     w = find_weights(Q,D,Y,lambda);
     
     %compute errors
-    [absErr_approx, relErr_approx] = regress_errors(X,Y,Xtest,Ytest,weights,sigma,norm_sample_size);
+    [absErr_approx, relErr_approx] = regress_errors(Xtest,Ytest,w,sigma,norm_sample_size);
 	toc
     
     absErr_approx
