@@ -23,7 +23,7 @@ sample = (1:fold_sizes(1)) - fold_sizes(1);
 
 
 %% Specify lambda choices
-num_gams = 1024;
+num_gams = 2048;
 curr_sample = createsample(X,num_gams*2,[],'random');
 [~, spectrum] = nystromeig(X,sigma,curr_sample,num_gams,0);
 spectrum = spectrum(end:-1:1);
@@ -34,39 +34,37 @@ errors = zeros(size(spectrum));
 
 for i = 1:FOLDS
 	disp(['Working fold ', num2str(i)]);
+    %nystrom sampling
     sample = sample + fold_sizes(i);
     curr_idx = setdiff(1:N,sample);
     curr_idx = shuffled(curr_idx);
-    
     curr_sample = createsample(X(curr_idx,:),nystrom_m,[],'random');
-    disp('Running nystrom...');
-	[U, L] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
     
-    [Qb,R] = qr(U,0);
-	clear U
-    [Qs,D] = eig(R*diag(L)*R');
-	clear R L
-    D = diag(D);
-    Q = Qb*Qs;
-    clear Qb Qs
-
+    disp('Running nystrom...');
+    %nystrom
+	[Un, Ln] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
+    
+    %orthogonalize
+    [Q,D] = nystromorth(Un,Ln);
+    
+    %sampling/precomputing for cv
     trainy = Y(curr_idx);
     qy = (Q'*trainy)./D;
-   	
 	subsample = sample(1:test_length);
-    Ktest = kernel(X(subsample, :), X(curr_idx,:), sigma);
-    KQ = Ktest*Q;
-    clear Ktest Q
-    testy = Y(subsample);
-    normtest = norm(testy);    
+    KQ = kernel(X(subsample, :), X(curr_idx,:), sigma)*Q;
+    clear Q
+    
+    %set proper scope
     dcount = length(D);
     old_err = 0; old_length =0;
+    normtest = norm(testy);
+    testy = Y(subsample);
     
     disp('Recording errors...');
     for j = 1:length(spectrum)
 		%Figure out last value to include
 		d = D(D>spectrum(j));
-        dcount = length(dcount);
+        dcount = length(d);
 		if dcount > 0 && old_length ~= dcount
 			esty = KQ(:,1:dcount)*qy(1:dcount);
             old_err = norm(esty-testy);
@@ -86,6 +84,8 @@ end
 
 errors = errors./FOLDS;
 [err, idx] = min(errors);
+idx
+length(errors)
 lambda = spectrum(idx);
 
 
