@@ -27,7 +27,7 @@ num_gams = 2048;
 curr_sample = createsample(X,num_gams*2,[],'random');
 [~, spectrum] = nystromeig(X,sigma,curr_sample,num_gams,0);
 spectrum = spectrum(end:-1:1);
-
+spectrum = spectrum./num_gams;
 
 %% Choose ideal lambda
 errors = zeros(size(spectrum));
@@ -57,18 +57,19 @@ for i = 1:FOLDS
     %set proper scope
     dcount = length(D);
     old_err = 0; old_length =0;
-    normtest = norm(testy);
     testy = Y(subsample);
+    normtest = norm(testy);
+
     
     disp('Recording errors...');
     for j = 1:length(spectrum)
 		%Figure out last value to include
-		d = D(D>spectrum(j));
+		d = D(D./nystrom_rank>spectrum(j));
         dcount = length(d);
 		if dcount > 0 && old_length ~= dcount
 			esty = KQ(:,1:dcount)*qy(1:dcount);
-            old_err = norm(esty-testy);
-			%old_err = norm(esty-testy)/normtest;
+            %old_err = norm(esty-testy);
+			old_err = norm(esty-testy)/sqrt(length(esty));
 			old_length = length(d);
 		elseif dcount > 0 && old_length == dcount
 			%don't need to do anything here
