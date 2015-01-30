@@ -10,10 +10,10 @@ dir = '/org/groups/padas/lula_data/machine_learning/';
 dir = '/work/00921/biros/maverick/data/machine_learning/';
 
 if flag
-    clearvars -except dir file sample lambda U L
+    clearvars -except dir file sample lambda U L Q D 
     [X,Y,Xtest,Ytest,~] = loaddata(file,dir);
 else
-    clearvars -except X Y Xtest Ytest file sample lambda U L 
+    clearvars -except X Y Xtest Ytest file sample lambda U L Q D 
     disp(['Using previously loaded data ', file]);
 end
 
@@ -24,6 +24,7 @@ sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
 cvflag = 1; 
+pflag = 1;
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
@@ -33,7 +34,7 @@ sigma = sigma_given(file,sigma_choice);
 if cvflag
 disp('------Lambda Cross-Val------');
 tic;
-[lambda,spectrum,err] = cv_lambda(X,Y,sigma,nystrom_rank);
+[lambda,spectrum,err,errors] = cv_lambda(X,Y,sigma,nystrom_rank,pflag);
 toc
 disp(['Lamba chosen: ',num2str(lambda),'; Associated error: ', num2str(err)]);
 else
@@ -63,6 +64,9 @@ if nflag
     [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
     
     toc
+	%orthogonalize
+    [Q,D] = nystromorth(U,L);
+	perc_spectrum_kept = sum(D>lambda)/length(D)
 else
     disp('Using previous nystrom decomp');
 end
@@ -76,7 +80,7 @@ disp('-----Estimating kernel approx error------')
 
 %Mat-vec error
 tic;
-[abs_err_mv,rel_err_mv] = matvec_errors(X,U,L,sigma,norm_sample_size,runs); 
+[ptwise_err_mv,rel_err_mv] = matvec_errors(X,U,L,sigma,norm_sample_size,runs); 
 toc
 
 % Output results
@@ -86,18 +90,17 @@ fprintf('Rel error: %.15f\n', rel_err_mv);
 if ~(isempty(Xtest) || isempty(Ytest))
     disp('-----Estimating test set errors------');    
    	tic;
-    %orthogonalize
-    [Q,D] = nystromorth(U,L);
-    
+
     %find weight vector
     w = find_weights(Q,D,Y,lambda);
     
     %compute errors
-    [absErr_approx, relErr_approx] = regress_errors(Xtest,Ytest,w,sigma,norm_sample_size);
+    [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
 	toc
     
     absErr_approx
     relErr_approx
+	class_corr
     %Absolute, relative with exact computation
     
 else

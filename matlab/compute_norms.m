@@ -17,9 +17,10 @@
 file = 'covtype_scaled.askit';
 nystrom_rank = 256;
 sigma_choice = 3;
-flag = 0; % 0=data_loaded, 1=need to load
+flag = 1; % 0=data_loaded, 1=need to load
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
+dir = '/work/00921/biros/maverick/data/machine_learning/';
 
 if flag
     clearvars -except dir sigma_choice nystrom_rank file sample
@@ -46,7 +47,7 @@ if sflag
 else
 	disp('Using old sample');
 end
-[U, L] = nystromeig(X, sigma, sample,nystrom_rank);
+[U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
 toc
 matvec = @(rhs) NystromMatVec(U, L, rhs);
 
