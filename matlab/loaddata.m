@@ -65,13 +65,9 @@ elseif isequal(dataset,'wine')
 elseif isequal(dataset,'susy')
     
     disp('Reading in SUSY data')
-    filename = 'SUSY.csv';
-    x = load([dir,filename]);
-    
-    Ytrain = x(:,1);
-    Yexact = [];
-    Xtrain = x(:,2:end);
-    Xtest = [];
+    filename = 'susy_icml';
+    load([dir,filename]);
+
     [n,~] = size(Xtrain);
     disp('Done loading data! (Test and training are the same)')
     
