@@ -2,14 +2,15 @@ clear all; close all;
 addpath meka
 dir = '~/data/machine_learning/';
 %dir = '/org/groups/padas/lula_data/machine_learning/';
+dir = '';
 
-rescale = true;
+rescale = ~true;
 save_scaled_to_file = ~true;
 whiten_data = ~true;
 
 if 1
 %load ijcnn.mat;% input data matrix A should be sparse matrix with size n by d
-file = 'covtype_libsvm';
+file = 'covtype_scaled.askit';
 %file ='ijcnn';
 %file = 'susy';
 [A,Y,Atest,Ytest,~]=loaddata(file,dir);
@@ -26,8 +27,9 @@ end
 %% ==================== parameters
 [n,dim]=size(A);
 k =256; % target rank
-gamma = 1; H = 1/sqrt(2*gamma);
-H=0.22; gamma=1/2/H/H;
+%gamma = 1; H = 1/sqrt(2*gamma);
+H=0.22
+gamma=1/2/H/H;
 rsmp = 2048; % sample several rows in K to measure kernel approximation error
 rsmpind = randsample(1:n,rsmp); 
 R =sqdist(A(rsmpind,:),A);
@@ -37,6 +39,7 @@ fprintf('Interactions per point that cannot be truncated %d\n',num_impint);
 opts.eta = 0.1; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
 opts.noc = 10; % number of clusters(default 10)
 opts.kmeansits=15;
+norm_sample_size = 1000;
 %%
 %==================== obtain the approximation U and S(K \approx U*S*U^T)
 t = cputime;
@@ -53,17 +56,15 @@ Kapp = @(x)U(rsmpind',:)*(S*(U'*x));
 %Kapp = (U(rsmpind',:)*S)*U';
 
 
-w = ones(n,1)/sqrt(n);
-ex = tmpK*w;
-up = Kapp(w);
-Errs = mean(abs(ex-up)./abs(ex))
-
+[abs_error, rel_error] = matvec_errors(X,U,L,sigma,norm_sample_size,runs);
 fprintf('The relative approximation error is %.1e (sample)\n',Errs);
 
 
 % Test regression
-weights = get_weight(U,L,Y,0);
-[abs_err,rel_err] = regression_test(A,Atest,Ytest, weights, sigma)
+weights = find_weights(U,S,Y,0);
+[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, sigma,norm_sample_size);
+rel_err
+class_err
 
 
 
