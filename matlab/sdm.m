@@ -8,8 +8,6 @@ rescale = ~true;
 save_scaled_to_file = ~true;
 whiten_data = ~true;
 
-if 1
-%load ijcnn.mat;% input data matrix A should be sparse matrix with size n by d
 file = 'covtype_libsvm';
 %file ='ijcnn';
 %file = 'susy';
@@ -55,18 +53,24 @@ fprintf('***************************\n');
 %==================== measure the relative error
 display('Testing meka!');
 [n,d] = size(A);
+U_meka = full(U_meka);S_meka = full(S_meka);
 
-
+tic;
 [abs_error, rel_error] = matvec_errors(A,U_meka,S_meka,H,norm_sample_size,runs);
-fprintf('The relative approximation error is %.1e (sample)\n',rel_error);
-
+disp(['The relative approximation error is ', num2str(rel_error)]);
+toc
 
 % Test regression
 [U,S] = nystromorth(U_meka,S_meka);
+clear U_meka S_meka
 weights = find_weights(U,S,Y,0);
-[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, sigma,norm_sample_size);
-rel_err
-class_err
+
+if ~(isempty(Atest) || isempty(Ytest))
+	disp('Finding regression errors...');
+	[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, H,norm_sample_size);
+	rel_err
+	class_err
+end
 
 
 

@@ -6,7 +6,7 @@ if exist('norm_sample_size')
 end
 
 [Ntest,~] = size(Xtest);
-smpidx = floor(1:Ntest/norm_sample_size:N);
+smpidx = floor(1:Ntest/norm_sample_size:Ntest);
 Ktest = kernel(Xtest(smpidx,:),X,sigma);
 
 Yguess = Ktest*w;
