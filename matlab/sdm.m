@@ -1,8 +1,8 @@
 clear all; close all;
 addpath meka
-dir = '~/data/machine_learning/';
-%dir = '/org/groups/padas/lula_data/machine_learning/';
-dir = '';
+%dir = '~/data/machine_learning/';
+dir = '/org/groups/padas/lula_data/machine_learning/';
+%dir = '';
 
 rescale = ~true;
 save_scaled_to_file = ~true;
@@ -30,16 +30,17 @@ k =256; % target rank
 %gamma = 1; H = 1/sqrt(2*gamma);
 H=0.22
 gamma=1/2/H/H;
-rsmp = 2048; % sample several rows in K to measure kernel approximation error
-rsmpind = randsample(1:n,rsmp); 
-R =sqdist(A(rsmpind,:),A);
-num_impint  = ceil(sum(sqrt(R(:))<(4*H))/rsmp);
-fprintf('Interactions per point that cannot be truncated %d\n',num_impint);
+%rsmp = 2048; % sample several rows in K to measure kernel approximation error
+%rsmpind = randsample(1:n,rsmp); 
+%R =sqdist(A(rsmpind,:),A);
+%num_impint  = ceil(sum(sqrt(R(:))<(4*H))/rsmp);
+%fprintf('Interactions per point that cannot be truncated %d\n',num_impint);
 
 opts.eta = 0.1; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
 opts.noc = 10; % number of clusters(default 10)
 opts.kmeansits=15;
 norm_sample_size = 1000;
+runs = 1;
 %%
 %==================== obtain the approximation U and S(K \approx U*S*U^T)
 t = cputime;
@@ -50,21 +51,21 @@ fprintf('***************************\n');
 %==================== measure the relative error
 display('Testing meka!');
 [n,d] = size(A);
-tmpK = exp(-(R)*gamma);
+%tmpK = exp(-(R)*gamma);
 
 Kapp = @(x)U(rsmpind',:)*(S*(U'*x));
 %Kapp = (U(rsmpind',:)*S)*U';
 
 
-[abs_error, rel_error] = matvec_errors(X,U,L,sigma,norm_sample_size,runs);
-fprintf('The relative approximation error is %.1e (sample)\n',Errs);
+[abs_error, rel_error] = matvec_errors(A,U,S,H,norm_sample_size,runs);
+fprintf('The relative approximation error is %.1e (sample)\n',rel_error);
 
 
 % Test regression
-weights = find_weights(U,S,Y,0);
-[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, sigma,norm_sample_size);
-rel_err
-class_err
+%weights = find_weights(U,S,Y,0);
+%[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, sigma,norm_sample_size);
+%rel_err
+%class_err
 
 
 
