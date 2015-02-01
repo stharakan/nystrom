@@ -1,37 +1,47 @@
 %% DEFINE kernel
 clear all; clear globals; clf;
+addpath ~/projects/knn/matlab/bintree/
+split_type_mtree = -1;split_kmeans     = 2;
+
+%%
 gaussian=@(r)exp(-1/2 * r.^2);
-visualize = true;
+visualize =~true;
 
 %% check rank of dataset using randomized sampling. 
 loadfile = true;
 dir='~/data/machine_learning/';
-file = {'covtype_libsvm','susy','mnist2m_scaled_nocommas.askit','ijcnn.askit','mnist8m_scaled_nocommas.askit'};
-if loadfile, P=loaddata(file{1},dir); end;
+%file = {'covtype_libsvm','susy','mnist2m_scaled_nocommas.askit','ijcnn.askit','mnist8m_scaled_nocommas.askit'};
+%if loadfile, P=loaddata(file{1},dir); end;
+load([dir,'covtype.mat']);
 %%
 [N,dim] = size(P);
 
 % here select a large group of points, split them in half, and test the ranks of the diagonal and off-diagonal blocks;
 
 % number of sampling points
-ell = 4024; 
-sample_ids = unique(randi(N,ell,1)); 
-ell = length(sample_ids);
+ell = 4096*4; 
+sample_ids = randperm(N); 
+sample_ids = sample_ids(1:ell);
 Ps = P(sample_ids,:);
-idx = kmeans(Ps,2);
+split_type = split_kmeans;
+split_type = split_type_mtree;
+idx = splitpoints(Ps',split_type);
+%idx = kmeans(Ps,2);
 fprintf('number of points per cluster: cluster 1: %5d, cluster 2:%5d\n', sum(idx==1), sum(idx==2));
 %%
-H=0.22; % kernel bandwidth
+H=0.08; % kernel bandwidth
 P1=Ps(idx==1,:);
 P2=Ps(idx==2,:);
 
 K11=gaussian(distance(P1',P1')/H);
 K21=gaussian(distance(P2',P1')/H);
+%s=svd( gaussian(distance(Ps',Ps')/H) )*N/ell;
 %%
 s11=svd(K11);
 s21=svd(K21);
 
-if visualize, hold off;semilogy(s11/max(s11)); hold on; semilogy(s21/max(s11),'r'); end;
+% if visualize, hold off;semilogy(s11/max(s11)); hold on; semilogy(s21/max(s11),'r'); end;
+[s11([1,128,1024,2048]), s21([1,128,1024,2048])]/max(s11)
 
 %% Study effecti of nearest neighbors.
 % find nearest neigbhors of P1 in P2, Remove them from the list of the far
