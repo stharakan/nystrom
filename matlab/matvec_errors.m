@@ -6,13 +6,19 @@ end
 if ~exist('runs')
 	runs = 1;
 end
+[d1,d2] = size(L);
+dflag = (d1 == d2);
 tests = 10;
 [N,r] = size(U);
 norm_sample_size = min(norm_sample_size, N);
 smpidx = floor(1:(N/norm_sample_size):N);
 
 w = ones(N,1)./sqrt(N);
-uw = L.*(U'*w);
+if dflag
+    uw = L*(U'*w);
+else
+    uw = L.*(U'*w);
+end
 estKw = U(smpidx,:) * uw;
 truKw = kernel(X(smpidx,:),X,sigma)*w;
 N_err = norm(truKw - estKw) / norm(truKw);
@@ -24,7 +30,12 @@ rel_error = 0;
 for j = 1:tests
 	w = normrnd(0,1,[N,1]);
 	w = w./norm(w);
-	uw = L.*(U'*w);
+    if dflag
+        uw = L*(U'*w);
+    else
+        uw = L.*(U'*w);
+    end
+    
 
 	if(runs ~=1)
 		abs_error = 0;
