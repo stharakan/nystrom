@@ -62,14 +62,14 @@ elseif isequal(dataset,'wine')
     disp('Done loading data! (Test and training are the same)')
     
     
-elseif isequal(dataset,'susy')
+elseif isequal(dataset,'susy') || isequal(dataset,'mnist8m_13')
     
-    disp('Reading in SUSY data')
-    filename = 'susy_icml';
+    disp(['Reading in ',dataset,' data'])
+    filename = [dataset,'_icml'];
     load([dir,filename]);
 
     [n,~] = size(Xtrain);
-    disp('Done loading data! (Test and training are the same)')
+    disp('Done loading data!')
     
 elseif isequal(dataset,'covtype')
     
