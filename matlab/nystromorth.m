@@ -8,11 +8,19 @@ function [Q, L] = nystromorth(Un,Ln)
 %   OUTPUTS:
 %       - Q:  orthogonalized version of Un
 %       - L: vector of adapted eigenvalues
+[d1,d2] = size(Ln);
+dflag = d1 == d2;
 
 [Qb,R] = qr(Un,0);
 clear Un
-[Qs,L] = svd(R*diag(Ln)*R');
+
+if dflag
+	[Qs,L] = svd(R*Ln*R');
+else
+	[Qs,L] = svd(R*diag(Ln)*R');
+end
 clear R Ln
+
 L = diag(L);
 Q = Qb*Qs;
 clear Qb Qs
