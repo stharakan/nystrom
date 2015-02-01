@@ -10,7 +10,7 @@ whiten_data = ~true;
 
 if 1
 %load ijcnn.mat;% input data matrix A should be sparse matrix with size n by d
-file = 'covtype_scaled.askit';
+file = 'covtype_libsvm';
 %file ='ijcnn';
 %file = 'susy';
 [A,Y,Atest,Ytest,~]=loaddata(file,dir);
@@ -62,18 +62,11 @@ fprintf('The relative approximation error is %.1e (sample)\n',rel_error);
 
 
 % Test regression
-[U,S] = mekaorth(U_meka,S_meka);
+[U,S] = nystromorth(U_meka,S_meka);
 weights = find_weights(U,S,Y,0);
 [abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, sigma,norm_sample_size);
 rel_err
 class_err
-
-
-
-
-
-
-
 
 
 
