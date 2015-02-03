@@ -27,6 +27,7 @@ lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
 cvflag = 1; 
 pflag = 1;
+do_all = 1;
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
@@ -63,7 +64,11 @@ if nflag
         disp('Using previous sample');
     end
     
-    [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    if do_all
+        [U, L,Um] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    else
+        [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    end
     
     toc
 	%orthogonalize
@@ -94,13 +99,15 @@ if ~(isempty(Xtest) || isempty(Ytest))
    	tic;
 
     %find weight vector
-    w = find_weights(Q,D,Y,lambda);
+    [w,wstar] = find_weights(Q,D,Y,lambda);
     
     %compute errors
-    [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
-	toc
-    
-    absErr_approx
+    if do_all
+        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,Um);
+    else
+        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
+    end
+    toc
     relErr_approx
 	class_corr
     %Absolute, relative with exact computation

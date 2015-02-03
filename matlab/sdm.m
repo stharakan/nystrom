@@ -3,6 +3,7 @@ addpath meka
 %dir = '~/data/machine_learning/';
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir = '';
+dir = '/work/00921/biros/maverick/data/machine_learning';
 
 rescale = ~true;
 save_scaled_to_file = ~true;
