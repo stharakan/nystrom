@@ -25,7 +25,7 @@ k =256; % target rank
 H=0.35
 gamma=1/2/H/H;
 
-opts.eta = 0.1; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
+opts.eta = 0.05; % decide the precentage of off-diagonal blocks are set to be zero(default 0.1)
 opts.noc = 10; % number of clusters(default 10)
 opts.kmeansits=15;
 norm_sample_size = 1000;
@@ -61,9 +61,9 @@ weights = find_weights(U,S,Y,lambda);
 
 if ~(isempty(Atest) || isempty(Ytest))
 	disp('Finding regression errors...');
-	[abs_err,rel_err,class_err] = regress_errors(A,Atest,Ytest, weights, H,norm_sample_size);
+	[abs_err,rel_err,class_corr] = regress_errors(A,Atest,Ytest, weights, H,norm_sample_size);
 	rel_err
-	class_err
+	class_corr
 end
 
 

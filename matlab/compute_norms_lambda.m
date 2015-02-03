@@ -20,6 +20,8 @@ end
 %% Specify other parameters
 nystrom_rank = 1024;
 sigma_choice = 2;
+sigma = sigma_given(file,sigma_choice);
+sigma
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
@@ -28,7 +30,7 @@ pflag = 1;
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
-sigma = sigma_given(file,sigma_choice);
+
 
 %% Select Lambda
 if cvflag
@@ -49,7 +51,7 @@ end
 %% Full Nystrom decomposition
 disp('-----Nystrom decmp-------')
 [N,d] = size(X);
-nystrom_m = 2*nystrom_rank;
+nystrom_m = nystrom_rank;
 
 if nflag
     tic;

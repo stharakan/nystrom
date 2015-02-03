@@ -16,7 +16,9 @@
 % Load data
 file = 'covtype_scaled.askit';
 nystrom_rank = 256;
-sigma_choice = 3;
+%sigma_choice = 3;
+%sigma = sigma_given(file,sigma_choice)
+sigma = 1
 flag = 1; % 0=data_loaded, 1=need to load
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
@@ -34,9 +36,8 @@ sflag = 1; %0=sample loaded, 1=need to load
 eflag = 1; %0=dont compute errors, 1= compute them
 [N,d] = size(X);
 X = single(X);
-nystrom_m = 2*nystrom_rank;
+nystrom_m = nystrom_rank;
 sample_method = 'random';
-sigma = sigma_given(file,sigma_choice)
 norm_sample_size = 1000;
 runs = 1;
 

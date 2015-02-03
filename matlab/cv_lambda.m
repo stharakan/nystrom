@@ -27,16 +27,21 @@ sample = (1:fold_sizes(1)) - fold_sizes(1);
 
 
 %% Specify lambda choices
-num_gams = min(max(2048, nystrom_rank),16384);
-curr_sample = createsample(X,min(num_gams*2,16384),[],'random');
-[~, spectrum] = nystromeig(X,sigma,curr_sample,num_gams,0);
-spectrum = spectrum(end:-1:1);
+if flag
+	FOLDS = 1;
+	nystrom_m = nystrom_rank;
+	spectrum = zeros(nystrom_rank,1);
+else
+	% Specify lambda choices
+    num_gams = min(max(2048, nystrom_rank),16384);
+    curr_sample = createsample(X,min(num_gams*2,16384),[],'random');
+    [~, spectrum] = nystromeig(X,sigma,curr_sample,num_gams,0);
+    spectrum = spectrum(end:-1:1);
+end
+
 
 %% Choose ideal lambda
 errors = zeros(size(spectrum));
-if flag
-	FOLDS = 1;
-end
 
 for i = 1:FOLDS
 	disp(['Working fold ', num2str(i)]);
@@ -65,12 +70,12 @@ for i = 1:FOLDS
     old_err = 0; old_length =0;
     testy = Y(subsample);
     normtest = norm(testy);
-
+	if flag, spectrum = D; end;
     
     disp('Recording errors...');
     for j = 1:length(spectrum)
 		%Figure out last value to include
-		d = D(D>spectrum(j));
+		d = D(D>=spectrum(j));
         dcount = length(d);
 		if dcount > 0 && old_length ~= dcount
 			esty = KQ(:,1:dcount)*qy(1:dcount);
@@ -92,6 +97,5 @@ errors = errors./FOLDS;
 [err, idx] = min(errors);
 lambda = spectrum(idx);
 
-save(['n',num2str(nystrom_rank),'_errs'], 'errors');
 
 
