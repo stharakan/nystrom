@@ -1,17 +1,12 @@
-%% DEFINE kernel
 clear all; clear globals; clf;
 addpath ~/projects/knn/matlab/bintree/
 split_type_mtree = -1;split_kmeans     = 2;
-
-%%
 gaussian=@(r)exp(-1/2 * r.^2);
 visualize =~true;
 
 %% check rank of dataset using randomized sampling. 
 loadfile = true;
-dir='~/data/machine_learning/';
-%file = {'covtype_libsvm','susy','mnist2m_scaled_nocommas.askit','ijcnn.askit','mnist8m_scaled_nocommas.askit'};
-%if loadfile, P=loaddata(file{1},dir); end;
+dir='/org/groups/padas/data/machine_learning/';
 load([dir,'covtype.mat']);
 %%
 [N,dim] = size(P);
@@ -19,7 +14,7 @@ load([dir,'covtype.mat']);
 % here select a large group of points, split them in half, and test the ranks of the diagonal and off-diagonal blocks;
 
 % number of sampling points
-ell = 4096*4; 
+ell = 4096*2; 
 sample_ids = randperm(N); 
 sample_ids = sample_ids(1:ell);
 Ps = P(sample_ids,:);
@@ -40,7 +35,7 @@ K21=gaussian(distance(P2',P1')/H);
 s11=svd(K11);
 s21=svd(K21);
 
-% if visualize, hold off;semilogy(s11/max(s11)); hold on; semilogy(s21/max(s11),'r'); end;
+if visualize, hold off;semilogy(s11/max(s11)); hold on; semilogy(s21/max(s11),'r'); end;
 [s11([1,128,1024,2048]), s21([1,128,1024,2048])]/max(s11)
 
 %% Study effecti of nearest neighbors.
