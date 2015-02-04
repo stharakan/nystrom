@@ -20,15 +20,18 @@ end
 %% Specify other parameters
 nystrom_rank = 1024;
 sigma_choice = 2;
+sigma = sigma_given(file,sigma_choice);
+sigma
 sflag = 1; %0=use old sample  , 1=generate new
 lflag = 1; %0=lambda computed , 1=need to compute
 nflag = 1; %0=nystrom computed, 1=generate new
 cvflag = 1; 
 pflag = 1;
+do_all = 1;
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
-sigma = sigma_given(file,sigma_choice);
+
 
 %% Select Lambda
 if cvflag
@@ -49,7 +52,7 @@ end
 %% Full Nystrom decomposition
 disp('-----Nystrom decmp-------')
 [N,d] = size(X);
-nystrom_m = 2*nystrom_rank;
+nystrom_m = nystrom_rank;
 
 if nflag
     tic;
@@ -61,7 +64,11 @@ if nflag
         disp('Using previous sample');
     end
     
-    [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    if do_all
+        [U, L,Um] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    else
+        [U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
+    end
     
     toc
 	%orthogonalize
@@ -92,13 +99,15 @@ if ~(isempty(Xtest) || isempty(Ytest))
    	tic;
 
     %find weight vector
-    w = find_weights(Q,D,Y,lambda);
+    [w,wstar] = find_weights(Q,D,Y,lambda);
     
     %compute errors
-    [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
-	toc
-    
-    absErr_approx
+    if do_all
+        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,Um);
+    else
+        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
+    end
+    toc
     relErr_approx
 	class_corr
     %Absolute, relative with exact computation

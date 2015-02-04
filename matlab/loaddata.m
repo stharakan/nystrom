@@ -114,7 +114,16 @@ elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat('
     [n,~] = size(Xtrain);
     
     disp('Done loading data! (Test and training are the same, no Y)')
-    
+   
+elseif isequal(dataset,'mnist8m')
+	disp(['Reading in ', dataset]);
+	load([dir,'mnist8m.mat']);
+	Xtrain = D;
+	load([dir,'mnist8m_labels.mat']);
+	Ytrain = L; Xtest = []; Ytest = [];
+	[n.~] = size(Xtrain);
+	disp('Done loading data! (No test set)');
+
 elseif isequal(dataset,'HIGGS.csv')
     Xtrain = load([dir,dataset]);
     Ytrain = Xtrain(:,1);
