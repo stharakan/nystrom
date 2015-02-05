@@ -1,5 +1,4 @@
 function [abs_error, rel_error] = matvec_errors(X,U,L,sigma,varargin)
-
 if length(varargin) < 2
     norm_sample_size = 1000;
     runs = 1;
@@ -22,6 +21,7 @@ if dflag
 else
     uw = L.*(U'*w);
 end
+
 estKw = U(smpidx,:) * uw;
 truKw = kernel(X(smpidx,:),X,sigma)*w;
 N_err = norm(truKw - estKw) / norm(truKw);
