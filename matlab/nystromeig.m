@@ -40,11 +40,12 @@ clear Lm
 Ln = Ln(1:p);
 Um = Um(:,1:p);
 if flag
-    Um = Um*diag((1/sqrt(nm)).*ones(size(Ln)));
-    Un= K_nm*(Um*diag(1./Ln));
+    %Um = Um*diag(sqrt(nm) * ones(size(Ln)));
+    Um = Um*diag(sqrt(nm)./Ln);
+    Un= K_nm*Um;
 else
     Un = 0;
 end
 
-varargout{1} = U_m;
+varargout{1} = Um;
 end
