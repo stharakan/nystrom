@@ -62,7 +62,7 @@ weights = find_weights(U,S,Y,lambda);
 
 if ~(isempty(Atest) || isempty(Ytest))
 	disp('Finding regression errors...');
-	[abs_err,rel_err,class_corr] = regress_errors(A,Atest,Ytest, weights, H,norm_sample_size);
+	[rel_err,class_corr] = regress_errors(A,Atest,Ytest, weights, H);
 	rel_err
 	class_corr
 end
