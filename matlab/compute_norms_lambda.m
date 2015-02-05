@@ -18,23 +18,23 @@ else
 end
 
 %% Specify other parameters
-nystrom_rank = 1024;
+nystrom_rank = 16384;
 sigma_choice = 2;
 sigma = sigma_given(file,sigma_choice);
-sigma
+sigma = 0.22
 sflag = 1; %0=use old sample  , 1=generate new
-lflag = 1; %0=lambda computed , 1=need to compute
+lflag = 1; lambda = 38.9; 
 nflag = 1; %0=nystrom computed, 1=generate new
 cvflag = 1; 
 pflag = 1;
-do_all = 1;
+do_all = 0;
 norm_sample_size = 1000;
 runs = 1;
 sample_method = 'random';
 
 
 %% Select Lambda
-if cvflag
+if lflag
 disp('------Lambda Cross-Val------');
 tic;
 [lambda,spectrum,err,errors] = cv_lambda(X,Y,sigma,nystrom_rank,pflag);
@@ -99,17 +99,20 @@ if ~(isempty(Xtest) || isempty(Ytest))
    	tic;
 
     %find weight vector
-    [w,wstar] = find_weights(Q,D,Y,lambda);
-    
+    [w] = find_weights(Q,D,Y,lambda);
     %compute errors
+    
     if do_all
-        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,Um);
+        [Ntest,~] = size(Xtest);
+        idx = floor(1: (Ntest/1000) : Ntest);
+	idx = 1:Ntest;
+        [relErr_approx,class_corr] = regress_errors(X(sample,:),Xtest(idx,:),Ytest,w,sigma,Um,U,L,1);
     else
-        [absErr_approx, relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma,norm_sample_size);
+        [reeErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma);
     end
     toc
     relErr_approx
-	class_corr
+    class_corr
     %Absolute, relative with exact computation
     
 else
