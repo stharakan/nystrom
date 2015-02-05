@@ -32,7 +32,7 @@ if flag
 	nystrom_m = nystrom_rank;
 	spectrum = zeros(nystrom_rank,1);
 else
-	% Specify lambda choices
+    % Specify lambda choices
     num_gams = min(max(2048, nystrom_rank),16384);
     curr_sample = createsample(X,min(num_gams*2,16384),[],'random');
     [~, spectrum] = nystromeig(X,sigma,curr_sample,num_gams,0);
@@ -44,7 +44,7 @@ end
 errors = zeros(size(spectrum));
 
 for i = 1:FOLDS
-	disp(['Working fold ', num2str(i)]);
+    disp(['Working fold ', num2str(i)]);
     %nystrom sampling
     sample = sample + fold_sizes(i);
     curr_idx = setdiff(1:N,sample);
@@ -53,7 +53,7 @@ for i = 1:FOLDS
     
     disp('Running nystrom...');
     %nystrom
-	[Un, Ln] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
+    [Un, Ln] = nystromeig(X(curr_idx,:),sigma,curr_sample,nystrom_rank,1);
     
     %orthogonalize
     [Q,D] = nystromorth(Un,Ln);
@@ -61,7 +61,7 @@ for i = 1:FOLDS
     %sampling/precomputing for cv
     trainy = Y(curr_idx);
     qy = (Q'*trainy)./D;
-	subsample = sample(1:test_length);
+    subsample = sample(1:test_length);
     KQ = kernel(X(subsample, :), X(curr_idx,:), sigma)*Q;
     clear Q
     
@@ -70,24 +70,24 @@ for i = 1:FOLDS
     old_err = 0; old_length =0;
     testy = Y(subsample);
     normtest = norm(testy);
-	if flag, spectrum = D; end;
+    if flag, spectrum = D; end;
     
     disp('Recording errors...');
     for j = 1:length(spectrum)
-		%Figure out last value to include
-		d = D(D>=spectrum(j));
+	%Figure out last value to include
+	d = D(D>=spectrum(j));
         dcount = length(d);
-		if dcount > 0 && old_length ~= dcount
-			esty = KQ(:,1:dcount)*qy(1:dcount);
+	if dcount > 0 && old_length ~= dcount
+	    esty = KQ(:,1:dcount)*qy(1:dcount);
             %old_err = norm(esty-testy);
-			old_err = norm(esty-testy)/sqrt(length(esty));
-			old_length = length(d);
-		elseif dcount > 0 && old_length == dcount
-			%don't need to do anything here
-		else
-			old_err = norm(testy);
-		end
-		errors(j) = errors(j) + old_err;
+	    old_err = norm(esty-testy)/sqrt(length(esty));
+	    old_length = length(d);
+	elseif dcount > 0 && old_length == dcount
+	    %don't need to do anything here
+	else
+	    old_err = norm(testy);
+	end
+	errors(j) = errors(j) + old_err;
         
     end
 
