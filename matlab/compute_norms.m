@@ -14,26 +14,29 @@
 %%%%%  ------- %%%%%%%%
 
 % Load data
-file = 'covtype_scaled.askit';
-nystrom_rank = 256;
+file = 'susy';
+nystrom_rank = 2048;
 %sigma_choice = 3;
 %sigma = sigma_given(file,sigma_choice)
-sigma = 1
+sigma = .5
 flag = 1; % 0=data_loaded, 1=need to load
 dir = '/org/groups/padas/lula_data/machine_learning/';
 %dir ='/h2/sameer/Documents/research/nystrom/';
 dir = '/work/00921/biros/maverick/data/machine_learning/';
 
 if flag
-    clearvars -except dir sigma_choice nystrom_rank file sample
+    clearvars -except dir sigma nystrom_rank file sample
     [X,Y,Xtest,Ytest,~] = loaddata(file,dir);
 else
-    clearvars -except X sigma_choice nystrom_rank file sample
+    clearvars -except X sigma nystrom_rank file sample
     disp(['Using previously loaded data ', file]);
 end
 
+kde = 1; %do kernel density estimation
+approx = 1; %approximate or exact kernel 
+do_all = 1; %all test points or 1000 samples
 sflag = 1; %0=sample loaded, 1=need to load
-eflag = 1; %0=dont compute errors, 1= compute them
+eflag = 0; %0=dont compute errors, 1= compute them
 [N,d] = size(X);
 X = single(X);
 nystrom_m = nystrom_rank;
@@ -48,7 +51,7 @@ if sflag
 else
 	disp('Using old sample');
 end
-[U, L] = nystromeig(X, sigma, sample,nystrom_rank,1);
+[U, L,Um] = nystromeig(X, sigma, sample,nystrom_rank,1);
 toc
 matvec = @(rhs) NystromMatVec(U, L, rhs);
 
@@ -63,6 +66,21 @@ if eflag
 else
 	disp('Not computing errors')
 end
+
+if kde
+    w = Y;
+    w(w == 1) = 1/sum(w== 1);
+    w(w ==-1) = -1/sum(w==-1);
+    w = w./norm(w);
+    if approx 
+    	[rel_error,class_corr] = regress_errors(X(sample,:),Xtest,Ytest,w,sigma,Um,U,L,do_all);
+    else
+        [rel_error,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma);
+    end
+    rel_error
+    class_corr
+end
+
 
 
 
