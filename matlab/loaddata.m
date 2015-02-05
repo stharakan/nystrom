@@ -121,7 +121,7 @@ elseif isequal(dataset,'mnist8m')
 	Xtrain = D;
 	load([dir,'mnist8m_labels.mat']);
 	Ytrain = L; Xtest = []; Ytest = [];
-	[n.~] = size(Xtrain);
+	[n,~] = size(Xtrain);
 	disp('Done loading data! (No test set)');
 
 elseif isequal(dataset,'HIGGS.csv')
