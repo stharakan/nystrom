@@ -16,7 +16,7 @@ if ll > 2
     if ll == 4
         all_flag = varargin{4};
     elseif ll >4  
-        disp('Incorrect format for regresserrors.m');
+        disp('Incorrect format for regress_errors.m');
     end
 end
 

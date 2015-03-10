@@ -21,11 +21,12 @@ end
 nystrom_rank = 16384;
 sigma_choice = 2;
 sigma = sigma_given(file,sigma_choice);
-sigma = 0.22
+sigma = 0.35
 sflag = 1; %0=use old sample  , 1=generate new
-lflag = 1; lambda = 38.9; 
+lflag = 0; lambda = 0.005; 
 nflag = 1; %0=nystrom computed, 1=generate new
-cvflag = 1; 
+eflag = 1;
+rflag = 0; 
 pflag = 1;
 do_all = 0;
 norm_sample_size = 1000;
@@ -87,14 +88,16 @@ disp('-----Estimating kernel approx error------')
 
 %Mat-vec error
 tic;
+if eflag
 [ptwise_err_mv,rel_err_mv] = matvec_errors(X,U,L,sigma,norm_sample_size,runs); 
+end
 toc
 
 % Output results
 fprintf('Sigma: %.4f , Rank: %d\n', sigma,nystrom_rank);
 fprintf('Rel error: %.15f\n', rel_err_mv);
 
-if ~(isempty(Xtest) || isempty(Ytest))
+if (~(isempty(Xtest) || isempty(Ytest)) && rflag) 
     disp('-----Estimating test set errors------');    
    	tic;
 
@@ -108,7 +111,7 @@ if ~(isempty(Xtest) || isempty(Ytest))
 	idx = 1:Ntest;
         [relErr_approx,class_corr] = regress_errors(X(sample,:),Xtest(idx,:),Ytest,w,sigma,Um,U,L,1);
     else
-        [reeErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma);
+        [relErr_approx,class_corr] = regress_errors(X,Xtest,Ytest,w,sigma);
     end
     toc
     relErr_approx

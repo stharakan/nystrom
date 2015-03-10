@@ -1,4 +1,4 @@
-function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
+function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,varargin)
 %LOADDATA will output the training and testdata set given which file to load
 % under the following specifications
 % 'spiral' - test/trainspiral_cs8000_n05
@@ -15,10 +15,13 @@ function [Xtrain,Ytrain,Xtest,Yexact,n] = loaddata(dataset,dir,labeled)
 %%%%% -------- %%%%%%%%
 % ICML datasets pass only part of name up to _libsvm
 %%%%% -------- %%%%%%%%
-
-
-if ~exist('labeled') %ignored for non-synthetic datasets
-    labeled = 0;
+ll = length(varargin);
+digit = 0; labeled = 0;
+if ll > 0
+	digit = varargin{1}; %digit to work with for mnist data
+	if ll > 1
+		labeled = varargin{2}; %only used on hypersphere/synthetic datasets
+	end
 end
 
 addpath(dir);
@@ -62,7 +65,7 @@ elseif isequal(dataset,'wine')
     disp('Done loading data! (Test and training are the same)')
     
     
-elseif isequal(dataset,'susy') || isequal(dataset,'mnist8m_13')
+elseif isequal(dataset,'susy') || isequal(dataset,'mnist8m_13') || isequal(dataset,'susy8d') 
     
     disp(['Reading in ',dataset,' data'])
     filename = [dataset,'_icml'];
@@ -97,6 +100,12 @@ elseif isequal(dataset,'ijcnn1') || isequal(dataset,'cpusmall')
     Xtest = []; Yexact = [];
     fclose(fid);
     
+elseif sum([repmat(' ',1,length(dataset) -4), '100k'] == dataset) == 4
+	disp(['Reading in ',dataset,' data']);
+	load([dir,dataset]);
+	[n,~] = size(Xtrain);
+	disp('Done loading data');
+
 elseif sum([repmat(' ',1,length(dataset) -7), '_libsvm'] == dataset) == 7
     disp(['Reading in ', dataset]);
     Xtrain = load([dir,dataset,'_train_askit']);
@@ -115,12 +124,28 @@ elseif strncmp(dataset,'gauss',5) || strncmp(dataset,'hyper',5) || sum([repmat('
     
     disp('Done loading data! (Test and training are the same, no Y)')
    
+elseif isequal(dataset,'mnist2m_digit')
+	disp(['Reading in ', dataset]);
+	load([dir,'mnist2m.mat']);
+    load([dir,'mnist2m_labels.mat']);
+	[Xtrain,Ytrain,Xtest,Yexact] = pick_digit(P,mnist_labels,digit);
+	clear P mnist_labels
+	[n,~] = size(Xtrain);
+	disp('Done loading data!');
+
+elseif isequal(dataset,'mnist2m_icml')
+	disp(['Reading in ', dataset]);
+	load([dir,'mnist2m_icml_train.mat']);
+	load([dir,'mnist2m_icml_all_but_train.mat']);
+	[n,~] = size(Xtrain);
+	disp('Done loading data!');
+
 elseif isequal(dataset,'mnist8m')
 	disp(['Reading in ', dataset]);
 	load([dir,'mnist8m.mat']);
 	Xtrain = D;
 	load([dir,'mnist8m_labels.mat']);
-	Ytrain = L; Xtest = []; Ytest = [];
+	Ytrain = L; Xtest = []; Yexact = [];
 	[n,~] = size(Xtrain);
 	disp('Done loading data! (No test set)');
 
